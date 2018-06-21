@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="24dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txv_character_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawableLeft="@drawable/ic_person"
+        android:drawableStart="@drawable/ic_person" />
+</LinearLayout>
