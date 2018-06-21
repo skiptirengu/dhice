@@ -12,6 +12,7 @@ import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.fragments.CharacterListFragment;
 
 public class MainActivity extends AppCompatActivity {
+    private final String SELECTED_MENU_ITEM = "last_fragment";
     private View mContainer;
 
     private OnNavigationItemSelectedListener mOnNavigationItemSelected = item -> {
@@ -33,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
         mContainer = findViewById(R.id.main_activity_container);
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelected);
+
+        int itemId = R.id.navigation_characters;
+        if (savedInstanceState != null) {
+            navigation.setSelectedItemId(savedInstanceState.getInt(SELECTED_MENU_ITEM, itemId));
+        } else {
+            navigation.setSelectedItemId(itemId);
+        }
     }
 
     public void setFragment(Fragment fragment) {
