@@ -60,8 +60,8 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         mMainActivity
                 .getDatabase()
                 .findCharacters()
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(item -> mAdapter.add(item));
     }
 
