@@ -1,15 +1,15 @@
 package com.skiptirengu.dhice.storage;
 
-import com.orm.SugarRecord;
+import io.requery.Entity;
+import io.requery.Generated;
+import io.requery.Key;
+import io.requery.Persistable;
 
-public class Character extends SugarRecord<Character> {
-    private String name = "";
+@Entity
+public interface Character extends Persistable {
+    @Key
+    @Generated
+    int getId();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    String getName();
 }

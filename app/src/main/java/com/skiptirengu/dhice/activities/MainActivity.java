@@ -12,7 +12,7 @@ import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.fragments.CharacterListFragment;
 
 public class MainActivity extends AppCompatActivity {
-    private final String SELECTED_MENU_ITEM = "last_fragment";
+    private static final String SELECTED_MENU_ITEM = "last_fragment";
     private View mContainer;
 
     private OnNavigationItemSelectedListener mOnNavigationItemSelected = item -> {
@@ -25,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     };
+
+    public View getContainer() {
+        return mContainer;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setFragment(Fragment fragment) {
+    public synchronized void setFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(mContainer.getId(), fragment);
         transaction.addToBackStack(fragment.getClass().getCanonicalName());
