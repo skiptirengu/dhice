@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="24dp"
-    android:orientation="vertical">
+    android:layout_height="56dp"
+    android:padding="8dp">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/imv_ic_character"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:contentDescription="@string/character_icon"
+        android:visibility="visible" />
 
     <TextView
         android:id="@+id/txv_character_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:drawableLeft="@drawable/ic_person"
-        android:drawableStart="@drawable/ic_person" />
-</LinearLayout>
+        android:layout_toEndOf="@id/imv_ic_character"
+        android:layout_toRightOf="@id/imv_ic_character"
+        android:textAlignment="center" />
+</RelativeLayout>
