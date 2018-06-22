@@ -10,10 +10,12 @@ import android.view.View;
 
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.fragments.CharacterListFragment;
+import com.skiptirengu.dhice.storage.Database;
 
 public class MainActivity extends AppCompatActivity {
     private static final String SELECTED_MENU_ITEM = "last_fragment";
     private View mContainer;
+    private Database mDatabase;
 
     private OnNavigationItemSelectedListener mOnNavigationItemSelected = item -> {
         switch (item.getItemId()) {
@@ -52,5 +54,12 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(mContainer.getId(), fragment);
         transaction.addToBackStack(fragment.getClass().getCanonicalName());
         transaction.commit();
+    }
+
+    public synchronized Database getDatabase() {
+        if (mDatabase == null) {
+            mDatabase = new Database(this);
+        }
+        return mDatabase;
     }
 }

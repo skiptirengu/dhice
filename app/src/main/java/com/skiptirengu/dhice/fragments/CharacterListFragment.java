@@ -18,28 +18,13 @@ import android.widget.TextView;
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
 import com.skiptirengu.dhice.storage.Character;
-import com.skiptirengu.dhice.storage.CharacterEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.Executor;
 
-import io.requery.EntityCache;
-import io.requery.TransactionIsolation;
-import io.requery.TransactionListener;
-import io.requery.meta.EntityModel;
-import io.requery.sql.Configuration;
-import io.requery.sql.ConnectionProvider;
-import io.requery.sql.EntityDataStore;
-import io.requery.sql.EntityStateListener;
-import io.requery.sql.Mapping;
-import io.requery.sql.Platform;
-import io.requery.sql.StatementListener;
-import io.requery.sql.TransactionMode;
-import io.requery.util.function.Function;
-import io.requery.util.function.Supplier;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * {@link Fragment}.
@@ -48,6 +33,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     private CharacterListAdapter mAdapter;
     private ListView mListView;
     private FloatingActionButton mActionButton;
+    private MainActivity mMainActivity;
 
     public CharacterListFragment() {
         // Required empty public constructor
@@ -57,6 +43,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.fragment_character_list, container, false);
 
+        mMainActivity = (MainActivity) getActivity();
         mAdapter = new CharacterListAdapter(requireContext(), new ArrayList<>());
         mListView = inflate.findViewById(R.id.listview_characters);
         mActionButton = inflate.findViewById(R.id.fab_new_character);
@@ -64,8 +51,18 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mActionButton.setOnClickListener(this);
+        refreshAdapter();
 
         return inflate;
+    }
+
+    private void refreshAdapter() {
+        mMainActivity
+                .getDatabase()
+                .findCharacters()
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(item -> mAdapter.add(item));
     }
 
     @Override
@@ -84,7 +81,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     private void setDataCharacterFragment(Bundle arguments) {
         CharacterDataFragment fragment = new CharacterDataFragment();
         fragment.setArguments(arguments);
-        ((MainActivity) Objects.requireNonNull(getActivity())).setFragment(fragment);
+        mMainActivity.setFragment(fragment);
     }
 
     class CharacterListAdapter extends ArrayAdapter<Character> {
