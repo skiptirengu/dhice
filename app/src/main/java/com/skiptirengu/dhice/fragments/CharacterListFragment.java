@@ -1,5 +1,6 @@
 package com.skiptirengu.dhice.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,6 +34,8 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     private CharacterListAdapter mAdapter;
     private ListView mListView;
     private FloatingActionButton mActionButton;
+    private View mProgress;
+    private View mMainLayout;
     private MainActivity mMainActivity;
 
     public CharacterListFragment() {
@@ -44,10 +47,13 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         View inflate = inflater.inflate(R.layout.fragment_character_list, container, false);
 
         mMainActivity = (MainActivity) getActivity();
+        mMainLayout = inflate.findViewById(R.id.layout_character_list);
+        mProgress = inflate.findViewById(R.id.progress_bar);
         mAdapter = new CharacterListAdapter(requireContext(), new ArrayList<>());
         mListView = inflate.findViewById(R.id.listview_characters);
         mActionButton = inflate.findViewById(R.id.fab_new_character);
 
+        mMainActivity.setTitle(R.string.fragment_title_my_characters);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mActionButton.setOnClickListener(this);
@@ -56,20 +62,30 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         return inflate;
     }
 
+    @SuppressLint("CheckResult")
     private void refreshAdapter() {
         mMainActivity
                 .getDatabase()
                 .findCharacters()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(item -> mAdapter.add(item));
+                .subscribe(
+                        item -> mAdapter.add(item),
+                        Throwable::printStackTrace,
+                        this::doneLoading
+                );
+    }
+
+    private void doneLoading() {
+        mProgress.setVisibility(View.GONE);
+        mMainLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Bundle arguments = new Bundle();
         arguments.putBoolean("update", true);
-        arguments.putLong("id", Objects.requireNonNull(mAdapter.getItem(i)).getId());
+        arguments.putInt("id", Objects.requireNonNull(mAdapter.getItem(i)).getId());
         setDataCharacterFragment(arguments);
     }
 

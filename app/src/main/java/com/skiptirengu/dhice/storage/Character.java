@@ -12,4 +12,14 @@ public interface Character extends Persistable {
     int getId();
 
     String getName();
+
+    void setName(String val);
+
+    String getRace();
+
+    void setRace(String val);
+
+    String getPreferredAttack();
+
+    void setPreferredAttack(String val);
 }
