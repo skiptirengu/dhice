@@ -61,6 +61,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
         mMainLayout = inflate.findViewById(R.id.layout_character_data);
         mProgress = inflate.findViewById(R.id.progress_bar);
+        setLoading(true);
 
         mRadioGroup = inflate.findViewById(R.id.character_radio_group);
         mRadioSpell = inflate.findViewById(R.id.character_use_spells);
@@ -92,54 +93,74 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
                                 mCharacter = character;
                                 mEdtName.setText(mCharacter.getName());
                                 mEdtRace.setText(mCharacter.getRace());
-                                if (mCharacter.getPreferredAttack().equals(USE_ATTACK)) {
+                                String preferredAttack = mCharacter.getPreferredAttack();
+                                if (preferredAttack != null && preferredAttack.equals(USE_ATTACK)) {
                                     mRadioAttack.setChecked(true);
                                 } else {
                                     mRadioSpell.setChecked(true);
                                 }
                             },
                             Throwable::printStackTrace,
-                            this::doneLoading
+                            () -> setLoading(false)
                     );
         } else {
             mMainActivity.setTitle(R.string.fragment_title_create_character);
-            doneLoading();
+            setLoading(false);
         }
-    }
-
-
-    private void doneLoading() {
-        mProgress.setVisibility(View.GONE);
-        mMainLayout.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("CheckResult")
     private void save() {
+        boolean error = false;
+
         if (mEdtName.getText().toString().isEmpty()) {
-            mEdtName.setError("Name is required");
+            mEdtName.setError(getString(R.string.name_required));
+            error = true;
         }
         if (mEdtRace.getText().toString().isEmpty()) {
-            mEdtRace.setError("Race is required");
+            mEdtRace.setError(getString(R.string.race_required));
+            error = true;
         }
 
-        mCharacter.setName(mEdtName.getText().toString());
-        mCharacter.setRace(mEdtRace.getText().toString());
+        if (!error) {
+            setLoading(true);
 
-        ReactiveEntityStore<Persistable> dataStore = mMainActivity.getDatabase().getDataStore();
-        Single<Character> insertOrUpdate;
+            mCharacter.setName(mEdtName.getText().toString());
+            mCharacter.setRace(mEdtRace.getText().toString());
 
-        if (mUpdate) {
-            insertOrUpdate = dataStore.update(mCharacter);
+            ReactiveEntityStore<Persistable> dataStore = mMainActivity.getDatabase().getDataStore();
+            Single<Character> insertOrUpdate;
+
+            if (mUpdate) {
+                insertOrUpdate = dataStore.update(mCharacter);
+            } else {
+                insertOrUpdate = dataStore.insert(mCharacter);
+            }
+
+            insertOrUpdate
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            val -> {
+                                this.returnToList();
+                                setLoading(false);
+                            },
+                            err -> {
+                                err.printStackTrace();
+                                setLoading(false);
+                            }
+                    );
+        }
+    }
+
+    private void setLoading(boolean loading) {
+        if (loading) {
+            mMainLayout.setVisibility(View.GONE);
+            mProgress.setVisibility(View.VISIBLE);
         } else {
-            insertOrUpdate = dataStore.insert(mCharacter);
+            mMainLayout.setVisibility(View.VISIBLE);
+            mProgress.setVisibility(View.GONE);
         }
-
-        insertOrUpdate
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        item -> this.returnToList()
-                );
     }
 
     private void returnToList() {

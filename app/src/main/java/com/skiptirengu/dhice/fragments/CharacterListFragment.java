@@ -49,6 +49,8 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         mMainActivity = (MainActivity) getActivity();
         mMainLayout = inflate.findViewById(R.id.layout_character_list);
         mProgress = inflate.findViewById(R.id.progress_bar);
+        setLoading(true);
+
         mAdapter = new CharacterListAdapter(requireContext(), new ArrayList<>());
         mListView = inflate.findViewById(R.id.listview_characters);
         mActionButton = inflate.findViewById(R.id.fab_new_character);
@@ -72,13 +74,8 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
                 .subscribe(
                         item -> mAdapter.add(item),
                         Throwable::printStackTrace,
-                        this::doneLoading
+                        () -> setLoading(false)
                 );
-    }
-
-    private void doneLoading() {
-        mProgress.setVisibility(View.GONE);
-        mMainLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -100,6 +97,16 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         mMainActivity.setFragment(fragment);
     }
 
+    private void setLoading(boolean loading) {
+        if (loading) {
+            mMainLayout.setVisibility(View.GONE);
+            mProgress.setVisibility(View.VISIBLE);
+        } else {
+            mMainLayout.setVisibility(View.VISIBLE);
+            mProgress.setVisibility(View.GONE);
+        }
+    }
+
     class CharacterListAdapter extends ArrayAdapter<Character> {
 
         CharacterListAdapter(@NonNull Context context, List<Character> characterList) {
@@ -109,13 +116,16 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            Character character = getItem(position);
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.character_list_item, parent, false);
             }
             TextView textView = convertView.findViewById(R.id.txv_character_name);
-            textView.setText(character != null ? character.getName() : null);
+            textView.setText(getDisplayText(Objects.requireNonNull(getItem(position))));
             return convertView;
+        }
+
+        private String getDisplayText(@NonNull Character character) {
+            return String.format("%s - %s", character.getName(), character.getRace());
         }
     }
 }

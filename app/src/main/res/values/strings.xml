@@ -9,11 +9,13 @@
     <string name="fragment_title_my_characters">My characters</string>
     <string name="character_icon">Character icon</string>
     <string name="character_name">Name*</string>
-    <string name="character_race">Race</string>
+    <string name="character_race">Race*</string>
     <string name="i_mostly_use">I mostly use:</string>
     <string name="magic_spells">Magic spells</string>
     <string name="weapon_attacks">Weapon attacks</string>
     <string name="save">Save</string>
     <string name="character_saved">Character saved!</string>
     <string name="update_character">Update character</string>
+    <string name="name_required">Name is required</string>
+    <string name="race_required">Race is required</string>
 </resources>
