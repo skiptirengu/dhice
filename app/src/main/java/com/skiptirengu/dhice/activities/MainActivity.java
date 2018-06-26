@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -16,11 +17,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String SELECTED_MENU_ITEM = "last_fragment";
     private View mContainer;
     private Database mDatabase;
+    private FragmentManager mFragmentManager;
 
     private OnNavigationItemSelectedListener mOnNavigationItemSelected = item -> {
         switch (item.getItemId()) {
             case R.id.navigation_characters:
-                setFragment(new CharacterListFragment());
+                setFragmentNonDuplicated(new CharacterListFragment());
                 return true;
             case R.id.navigation_roll:
                 return true;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mContainer = findViewById(R.id.main_activity_container);
+        mFragmentManager = getSupportFragmentManager();
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelected);
 
@@ -49,10 +52,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public synchronized void setFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+    private void setFragmentNonDuplicated(Fragment fragment) {
+        Fragment topFragment = getTopFragment();
+        if (topFragment == null || !fragment.getClass().equals(topFragment.getClass())) {
+            setFragment(fragment);
+        }
+    }
+
+    private Fragment getTopFragment() {
+        if (mFragmentManager.getBackStackEntryCount() == 0) {
+            return null;
+        } else {
+            return mFragmentManager.getFragments().get(0);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mFragmentManager.getBackStackEntryCount() == 0) {
+            super.onBackPressed();
+        } else {
+            mFragmentManager.popBackStack();
+        }
+    }
+
+    public void setFragment(Fragment fragment) {
+        setFragment(fragment, true);
+    }
+
+    public synchronized void setFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
         transaction.replace(mContainer.getId(), fragment);
-        transaction.addToBackStack(fragment.getClass().getCanonicalName());
+        if (addToBackStack) {
+            transaction.addToBackStack(fragment.getClass().getCanonicalName());
+        }
         transaction.commit();
     }
 

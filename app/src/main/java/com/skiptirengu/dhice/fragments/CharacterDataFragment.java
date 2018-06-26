@@ -4,6 +4,7 @@ package com.skiptirengu.dhice.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
@@ -43,6 +44,8 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private View mMainLayout;
     private AppCompatEditText mEdtName;
     private AppCompatEditText mEdtRace;
+    private TextInputLayout mEdtNameLayout;
+    private TextInputLayout mEdtRaceLayout;
     private Button mBtnSave;
 
     private Character mCharacter;
@@ -69,6 +72,8 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mEdtName = inflate.findViewById(R.id.character_name);
         mEdtRace = inflate.findViewById(R.id.character_race);
         mBtnSave = inflate.findViewById(R.id.save_character);
+        mEdtNameLayout = inflate.findViewById(R.id.txt_layout_character_name);
+        mEdtRaceLayout = inflate.findViewById(R.id.txt_layout_character_race);
 
         mRadioGroup.setOnCheckedChangeListener(this);
         mBtnSave.setOnClickListener(this);
@@ -111,46 +116,48 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
     @SuppressLint("CheckResult")
     private void save() {
-        boolean error = false;
+        View error = null;
 
-        if (mEdtName.getText().toString().isEmpty()) {
-            mEdtName.setError(getString(R.string.name_required));
-            error = true;
-        }
         if (mEdtRace.getText().toString().isEmpty()) {
-            mEdtRace.setError(getString(R.string.race_required));
-            error = true;
+            mEdtRaceLayout.setError(getString(R.string.race_required));
+            error = mEdtRace;
+        }
+        if (mEdtName.getText().toString().isEmpty()) {
+            mEdtNameLayout.setError(getString(R.string.name_required));
+            error = mEdtName;
         }
 
-        if (!error) {
-            setLoading(true);
-
-            mCharacter.setName(mEdtName.getText().toString());
-            mCharacter.setRace(mEdtRace.getText().toString());
-
-            ReactiveEntityStore<Persistable> dataStore = mMainActivity.getDatabase().getDataStore();
-            Single<Character> insertOrUpdate;
-
-            if (mUpdate) {
-                insertOrUpdate = dataStore.update(mCharacter);
-            } else {
-                insertOrUpdate = dataStore.insert(mCharacter);
-            }
-
-            insertOrUpdate
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            val -> {
-                                this.returnToList();
-                                setLoading(false);
-                            },
-                            err -> {
-                                err.printStackTrace();
-                                setLoading(false);
-                            }
-                    );
+        if (error != null) {
+            error.requestFocus();
+            return;
         }
+
+        setLoading(true);
+        mCharacter.setName(mEdtName.getText().toString());
+        mCharacter.setRace(mEdtRace.getText().toString());
+
+        ReactiveEntityStore<Persistable> dataStore = mMainActivity.getDatabase().getDataStore();
+        Single<Character> insertOrUpdate;
+
+        if (mUpdate) {
+            insertOrUpdate = dataStore.update(mCharacter);
+        } else {
+            insertOrUpdate = dataStore.insert(mCharacter);
+        }
+
+        insertOrUpdate
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        val -> {
+                            this.returnToList();
+                            setLoading(false);
+                        },
+                        err -> {
+                            err.printStackTrace();
+                            setLoading(false);
+                        }
+                );
     }
 
     private void setLoading(boolean loading) {
