@@ -20,4 +20,5 @@
     <string name="race_required">Race is required</string>
     <string name="bonus_type">Bonus type</string>
     <string name="bonus">Bonus</string>
+    <string name="description">Description</string>
 </resources>
