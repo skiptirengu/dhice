@@ -4,7 +4,6 @@ package com.skiptirengu.dhice.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
@@ -44,8 +43,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private View mMainLayout;
     private AppCompatEditText mEdtName;
     private AppCompatEditText mEdtRace;
-    private TextInputLayout mEdtNameLayout;
-    private TextInputLayout mEdtRaceLayout;
     private Button mBtnSave;
 
     private Character mCharacter;
@@ -72,8 +69,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mEdtName = inflate.findViewById(R.id.character_name);
         mEdtRace = inflate.findViewById(R.id.character_race);
         mBtnSave = inflate.findViewById(R.id.save_character);
-        mEdtNameLayout = inflate.findViewById(R.id.txt_layout_character_name);
-        mEdtRaceLayout = inflate.findViewById(R.id.txt_layout_character_race);
 
         mRadioGroup.setOnCheckedChangeListener(this);
         mBtnSave.setOnClickListener(this);
@@ -119,11 +114,11 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         View error = null;
 
         if (mEdtRace.getText().toString().isEmpty()) {
-            mEdtRaceLayout.setError(getString(R.string.race_required));
+            mEdtRace.setError(getString(R.string.race_required));
             error = mEdtRace;
         }
         if (mEdtName.getText().toString().isEmpty()) {
-            mEdtNameLayout.setError(getString(R.string.name_required));
+            mEdtName.setError(getString(R.string.name_required));
             error = mEdtName;
         }
 
