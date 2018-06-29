@@ -37,8 +37,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/margin_4"
-                android:layout_marginStart="@dimen/margin_4"
+                android:layout_marginLeft="@dimen/margin_3"
+                android:layout_marginStart="@dimen/margin_3"
                 android:text="@string/bonus_type"
                 android:textSize="@dimen/input_label" />
 

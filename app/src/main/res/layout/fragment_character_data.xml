@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/character_data_scrollview"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -49,10 +51,10 @@
                 android:id="@+id/character_radio_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="36dp"
-                android:layout_marginLeft="@dimen/margin_4"
-                android:layout_marginStart="@dimen/margin_4"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/margin_3"
+                android:layout_marginStart="@dimen/margin_3"
+                android:layout_marginTop="@dimen/activity_vertical_margin_md"
                 android:orientation="vertical">
 
                 <TextView
@@ -75,7 +77,25 @@
                     android:text="@string/weapon_attacks" />
             </RadioGroup>
 
-            <include layout="@layout/character_bonus" />
+            <LinearLayout
+                android:id="@+id/layout_character_bonus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_add_bonus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:drawableLeft="@drawable/ic_add_white"
+                android:drawableStart="@drawable/ic_add_white"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:text="@string/bonus"
+                android:textColor="@color/primaryTextColor"
+                app:backgroundTint="@color/secondaryColor"
+                tools:ignore="RtlSymmetry" />
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/save_character"
@@ -88,5 +108,7 @@
                 app:backgroundTint="@color/secondaryColor" />
 
         </LinearLayout>
+
     </FrameLayout>
+
 </ScrollView>

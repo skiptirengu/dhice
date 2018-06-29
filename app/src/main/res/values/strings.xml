@@ -19,8 +19,8 @@
     <string name="name_required">Name is required</string>
     <string name="race_required">Race is required</string>
     <string name="bonus_type">Bonus type</string>
-    <string name="bonus">Bonus</string>
     <string name="description">Description</string>
+    <string name="bonus">Bonus</string>
     <array name="array_item">
         <item>String</item>
     </array>

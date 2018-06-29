@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.skiptirengu.dhice.R;
@@ -31,7 +32,7 @@ import io.requery.reactivex.ReactiveEntityStore;
 /**
  * {@link Fragment}
  */
-public class CharacterDataFragment extends Fragment implements OnCheckedChangeListener, View.OnClickListener {
+public class CharacterDataFragment extends Fragment implements OnCheckedChangeListener {
     private static final String USE_SPELL = "spells";
     private static final String USE_ATTACK = "attacks";
 
@@ -41,9 +42,12 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private MainActivity mMainActivity;
     private View mProgress;
     private View mMainLayout;
+    private ViewGroup mLayoutBonus;
+    private ScrollView mScrollView;
     private AppCompatEditText mEdtName;
     private AppCompatEditText mEdtRace;
     private Button mBtnSave;
+    private Button mBtnAddBonus;
 
     private Character mCharacter;
     private boolean mUpdate;
@@ -61,6 +65,8 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
         mMainLayout = inflate.findViewById(R.id.layout_character_data);
         mProgress = inflate.findViewById(R.id.progress_bar);
+        mLayoutBonus = inflate.findViewById(R.id.layout_character_bonus);
+        mScrollView = inflate.findViewById(R.id.character_data_scrollview);
         setLoading(true);
 
         mRadioGroup = inflate.findViewById(R.id.character_radio_group);
@@ -69,9 +75,11 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mEdtName = inflate.findViewById(R.id.character_name);
         mEdtRace = inflate.findViewById(R.id.character_race);
         mBtnSave = inflate.findViewById(R.id.save_character);
+        mBtnAddBonus = inflate.findViewById(R.id.btn_add_bonus);
 
         mRadioGroup.setOnCheckedChangeListener(this);
-        mBtnSave.setOnClickListener(this);
+        mBtnSave.setOnClickListener(view -> save());
+        mBtnAddBonus.setOnClickListener(this::addBonus);
         unrwapArguments();
 
         return inflate;
@@ -107,6 +115,13 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
             mMainActivity.setTitle(R.string.fragment_title_create_character);
             setLoading(false);
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private void addBonus(View view) {
+        View layout = LayoutInflater.from(view.getContext()).inflate(R.layout.character_bonus, mLayoutBonus, false);
+        mLayoutBonus.addView(layout);
+        mScrollView.smoothScrollTo((int) mBtnAddBonus.getX(), (int) mBtnAddBonus.getY());
     }
 
     @SuppressLint("CheckResult")
@@ -180,10 +195,5 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
                 mCharacter.setPreferredAttack(USE_ATTACK);
                 break;
         }
-    }
-
-    @Override
-    public void onClick(View view) {
-        save();
     }
 }
