@@ -3,6 +3,7 @@ package com.skiptirengu.dhice.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
@@ -121,7 +122,19 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private void addBonus(View view) {
         View layout = LayoutInflater.from(view.getContext()).inflate(R.layout.character_bonus, mLayoutBonus, false);
         mLayoutBonus.addView(layout);
-        mScrollView.smoothScrollTo((int) mBtnAddBonus.getX(), (int) mBtnAddBonus.getY());
+        (new Handler()).post(() -> mScrollView.smoothScrollTo(0, getRelativeTop(mBtnAddBonus, mScrollView)));
+    }
+
+    private int getRelativeTop(View view, ScrollView scrollView) {
+        if (view != null && view.getParent() != null) {
+            if (view.getParent() == scrollView.getChildAt(0)) {
+                return view.getTop();
+            } else {
+                return view.getTop() + getRelativeTop(view.getParent() instanceof View ? ((View) view.getParent()) : null, scrollView);
+            }
+        }
+
+        return 0;
     }
 
     @SuppressLint("CheckResult")
