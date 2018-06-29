@@ -3,7 +3,6 @@ package com.skiptirengu.dhice.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
@@ -24,7 +23,9 @@ import com.skiptirengu.dhice.storage.CharacterEntity;
 import com.transitionseverywhere.TransitionManager;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -34,7 +35,7 @@ import io.requery.reactivex.ReactiveEntityStore;
 /**
  * {@link Fragment}
  */
-public class CharacterDataFragment extends Fragment implements OnCheckedChangeListener {
+public class CharacterDataFragment extends Fragment implements OnCheckedChangeListener, OnBackPressedListener {
     private static final String USE_SPELL = "spells";
     private static final String USE_ATTACK = "attacks";
 
@@ -123,7 +124,15 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         setFadeInTransition(mScrollView);
         View layout = LayoutInflater.from(view.getContext()).inflate(R.layout.character_bonus, mLayoutBonus, false);
         mLayoutBonus.addView(layout);
-        (new Handler()).postDelayed(() -> mScrollView.fullScroll(View.FOCUS_DOWN), 300);
+        Observable
+                .empty()
+                .delay(200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(() -> {
+                    mScrollView.fullScroll(View.FOCUS_DOWN);
+                    layout.findViewById(R.id.character_bonus_description).requestFocus();
+                })
+                .subscribe();
     }
 
     private void setFadeInTransition(ViewGroup viewGroup) {
@@ -201,5 +210,19 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
                 mCharacter.setPreferredAttack(USE_ATTACK);
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        mMainActivity.getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public boolean onMenuItemPressed(int menuItemId) {
+        boolean thisFragment = menuItemId == R.id.navigation_characters;
+        if (thisFragment) {
+            onBackPressed();
+        }
+        return thisFragment;
     }
 }

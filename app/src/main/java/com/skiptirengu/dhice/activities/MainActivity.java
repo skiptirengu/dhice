@@ -9,24 +9,35 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.skiptirengu.dhice.Application;
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.fragments.CharacterListFragment;
+import com.skiptirengu.dhice.fragments.OnBackPressedListener;
 import com.skiptirengu.dhice.storage.Database;
 
 public class MainActivity extends AppCompatActivity {
     private static final String SELECTED_MENU_ITEM = "last_fragment";
     private View mContainer;
-    private Database mDatabase;
     private FragmentManager mFragmentManager;
 
     private OnNavigationItemSelectedListener mOnNavigationItemSelected = item -> {
-        switch (item.getItemId()) {
+        int itemId = item.getItemId();
+
+        Fragment topFragmet = getTopFragment();
+        if (topFragmet != null
+                && (topFragmet instanceof OnBackPressedListener)
+                && ((OnBackPressedListener) topFragmet).onMenuItemPressed(itemId)) {
+            return false;
+        }
+
+        switch (itemId) {
             case R.id.navigation_characters:
                 setFragmentNonDuplicated(new CharacterListFragment());
                 return true;
             case R.id.navigation_roll:
                 return true;
         }
+
         return false;
     };
 
@@ -55,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private void setFragmentNonDuplicated(Fragment fragment) {
         Fragment topFragment = getTopFragment();
         if (topFragment == null || !fragment.getClass().equals(topFragment.getClass())) {
-            setFragment(fragment);
+            setFragment(fragment, false);
         }
     }
 
@@ -69,10 +80,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (mFragmentManager.getBackStackEntryCount() == 0) {
-            super.onBackPressed();
+        Fragment topFragmet = getTopFragment();
+        if (topFragmet != null && topFragmet instanceof OnBackPressedListener) {
+            ((OnBackPressedListener) topFragmet).onBackPressed();
         } else {
-            mFragmentManager.popBackStack();
+            super.onBackPressed();
         }
     }
 
@@ -89,10 +101,7 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    public synchronized Database getDatabase() {
-        if (mDatabase == null) {
-            mDatabase = new Database(this);
-        }
-        return mDatabase;
+    public Database getDatabase() {
+        return ((Application) getApplication()).getDatabase();
     }
 }
