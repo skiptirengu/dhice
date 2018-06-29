@@ -21,6 +21,7 @@ import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.storage.CharacterEntity;
+import com.transitionseverywhere.TransitionManager;
 
 import java.util.Objects;
 
@@ -42,7 +43,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private RadioButton mRadioAttack;
     private MainActivity mMainActivity;
     private View mProgress;
-    private View mMainLayout;
+    private ViewGroup mMainLayout;
     private ViewGroup mLayoutBonus;
     private ScrollView mScrollView;
     private AppCompatEditText mEdtName;
@@ -118,23 +119,15 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         }
     }
 
-    @SuppressLint("CheckResult")
     private void addBonus(View view) {
+        setFadeInTransition(mScrollView);
         View layout = LayoutInflater.from(view.getContext()).inflate(R.layout.character_bonus, mLayoutBonus, false);
         mLayoutBonus.addView(layout);
-        (new Handler()).post(() -> mScrollView.smoothScrollTo(0, getRelativeTop(mBtnAddBonus, mScrollView)));
+        (new Handler()).postDelayed(() -> mScrollView.fullScroll(View.FOCUS_DOWN), 300);
     }
 
-    private int getRelativeTop(View view, ScrollView scrollView) {
-        if (view != null && view.getParent() != null) {
-            if (view.getParent() == scrollView.getChildAt(0)) {
-                return view.getTop();
-            } else {
-                return view.getTop() + getRelativeTop(view.getParent() instanceof View ? ((View) view.getParent()) : null, scrollView);
-            }
-        }
-
-        return 0;
+    private void setFadeInTransition(ViewGroup viewGroup) {
+        TransitionManager.beginDelayedTransition(viewGroup);
     }
 
     @SuppressLint("CheckResult")
