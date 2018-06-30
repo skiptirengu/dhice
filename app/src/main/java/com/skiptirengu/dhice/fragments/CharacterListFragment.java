@@ -1,10 +1,8 @@
 package com.skiptirengu.dhice.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,16 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
-import com.skiptirengu.dhice.storage.Character;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -51,7 +44,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         mProgress = inflate.findViewById(R.id.progress_bar);
         setLoading(true);
 
-        mAdapter = new CharacterListAdapter(requireContext(), new ArrayList<>());
+        mAdapter = new CharacterListAdapter(requireContext());
         mListView = inflate.findViewById(R.id.listview_characters);
         mActionButton = inflate.findViewById(R.id.fab_new_character);
 
@@ -104,28 +97,6 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         } else {
             mMainLayout.setVisibility(View.VISIBLE);
             mProgress.setVisibility(View.GONE);
-        }
-    }
-
-    class CharacterListAdapter extends ArrayAdapter<Character> {
-
-        CharacterListAdapter(@NonNull Context context, List<Character> characterList) {
-            super(context, 0, characterList);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.character_list_item, parent, false);
-            }
-            TextView textView = convertView.findViewById(R.id.txv_character_name);
-            textView.setText(getDisplayText(Objects.requireNonNull(getItem(position))));
-            return convertView;
-        }
-
-        private String getDisplayText(@NonNull Character character) {
-            return String.format("%s - %s", character.getName(), character.getRace());
         }
     }
 }
