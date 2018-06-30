@@ -126,7 +126,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mLayoutBonus.addView(layout);
         Observable
                 .empty()
-                .delay(200, TimeUnit.MILLISECONDS)
+                .delay(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete(() -> {
                     mScrollView.fullScroll(View.FOCUS_DOWN);
