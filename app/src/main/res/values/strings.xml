@@ -21,6 +21,7 @@
     <string name="bonus_type">Bonus type</string>
     <string name="description">Description</string>
     <string name="bonus">Bonus</string>
+    <string name="delete">Delete</string>
     <array name="array_item">
         <item>String</item>
     </array>

@@ -4,6 +4,7 @@ package com.skiptirengu.dhice.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
@@ -26,7 +27,6 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.requery.Persistable;
@@ -53,18 +53,21 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private Button mBtnAddBonus;
 
     private Character mCharacter;
-    private boolean mUpdate;
 
     public CharacterDataFragment() {
         // Required empty public constructor
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mMainActivity = Objects.requireNonNull((MainActivity) getActivity());
+        mCharacter = new CharacterEntity();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.fragment_character_data, container, false);
-
-        mCharacter = new CharacterEntity();
-        mMainActivity = Objects.requireNonNull((MainActivity) getActivity());
 
         mMainLayout = inflate.findViewById(R.id.layout_character_data);
         mProgress = inflate.findViewById(R.id.progress_bar);
@@ -92,7 +95,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private void unrwapArguments() {
         Bundle arguments = getArguments();
 
-        if (arguments != null && (mUpdate = arguments.getBoolean("update"))) {
+        if (arguments != null && arguments.getBoolean("update")) {
             mMainActivity
                     .getDatabase()
                     .findCharacterById(arguments.getInt("id"))
@@ -162,15 +165,8 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mCharacter.setRace(mEdtRace.getText().toString());
 
         ReactiveEntityStore<Persistable> dataStore = mMainActivity.getDatabase().getDataStore();
-        Single<Character> insertOrUpdate;
 
-        if (mUpdate) {
-            insertOrUpdate = dataStore.update(mCharacter);
-        } else {
-            insertOrUpdate = dataStore.insert(mCharacter);
-        }
-
-        insertOrUpdate
+        dataStore.upsert(mCharacter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
