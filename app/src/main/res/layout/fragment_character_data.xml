@@ -88,8 +88,12 @@
                 android:id="@+id/layout_character_bonus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="false"
                 android:divider="@null"
                 android:dividerHeight="@dimen/activity_vertical_margin"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:listSelector="@android:color/transparent"
                 android:scrollbars="none" />
 
             <android.support.v7.widget.AppCompatButton
