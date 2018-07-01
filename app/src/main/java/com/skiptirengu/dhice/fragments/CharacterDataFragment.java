@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -123,10 +124,23 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         }
     }
 
-    private void addBonus(View view) {
+    private synchronized void addBonus(View view) {
         setFadeInTransition(mScrollView);
-        View layout = LayoutInflater.from(view.getContext()).inflate(R.layout.character_bonus, mLayoutBonus, false);
+
+        View layout = LayoutInflater
+                .from(view.getContext())
+                .inflate(R.layout.character_bonus, mLayoutBonus, false);
+
+        ImageView imageView = layout.findViewById(R.id.btn_delete_bonus);
+        imageView.setOnClickListener(clickedView -> {
+            setFadeInTransition(mScrollView);
+            //mCharacter.getBonuses().remove(count);
+            mLayoutBonus.removeView(layout);
+        });
+
+        //mCharacter.getBonuses().add(new CharacterBonusEntity());
         mLayoutBonus.addView(layout);
+
         Observable
                 .empty()
                 .delay(300, TimeUnit.MILLISECONDS)
