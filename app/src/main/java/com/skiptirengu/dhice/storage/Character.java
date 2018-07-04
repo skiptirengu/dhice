@@ -1,5 +1,7 @@
 package com.skiptirengu.dhice.storage;
 
+import android.databinding.Bindable;
+import android.databinding.Observable;
 import android.os.Parcelable;
 
 import java.util.List;
@@ -12,19 +14,22 @@ import io.requery.OneToMany;
 import io.requery.Persistable;
 
 @Entity
-public interface Character extends Persistable, Parcelable {
+public interface Character extends Persistable, Parcelable, Observable {
     @Key
     @Generated
     int getId();
 
+    @Bindable
     String getName();
 
     void setName(String val);
 
+    @Bindable
     String getRace();
 
     void setRace(String val);
 
+    @Bindable
     String getPreferredAttack();
 
     void setPreferredAttack(String val);

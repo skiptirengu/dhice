@@ -1,6 +1,5 @@
 package com.skiptirengu.dhice.fragments;
 
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,16 +16,12 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
-import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
 import com.skiptirengu.dhice.storage.Character;
-import com.skiptirengu.dhice.storage.CharacterBonus;
-import com.skiptirengu.dhice.storage.CharacterBonusEntity;
 import com.skiptirengu.dhice.storage.CharacterEntity;
 import com.transitionseverywhere.TransitionManager;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -49,16 +44,14 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private MainActivity mMainActivity;
     private View mProgress;
     private ViewGroup mMainLayout;
-    //private ViewGroup mLayoutBonus;
+    private ViewGroup mLayoutBonus;
     private ScrollView mScrollView;
-    private ExpandableHeightListView mBonusList;
     private AppCompatEditText mEdtName;
     private AppCompatEditText mEdtRace;
     private Button mBtnSave;
     private Button mBtnAddBonus;
 
     private Character mCharacter;
-    private CharacterBonusAdapter mBonusAdapter;
 
     public CharacterDataFragment() {
         // Required empty public constructor
@@ -69,8 +62,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         super.onCreate(savedInstanceState);
         mMainActivity = Objects.requireNonNull((MainActivity) getActivity());
         mCharacter = new CharacterEntity();
-        mBonusAdapter = new CharacterBonusAdapter(getContext(), mCharacter.getBonuses());
-        assert getArguments() != null;
     }
 
     @Override
@@ -79,7 +70,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
         mMainLayout = inflate.findViewById(R.id.layout_character_data);
         mProgress = inflate.findViewById(R.id.progress_bar);
-        //mLayoutBonus = inflate.findViewById(R.id.layout_character_bonus);
+        mLayoutBonus = inflate.findViewById(R.id.layout_character_bonus);
         mScrollView = inflate.findViewById(R.id.character_data_scrollview);
         setLoading(true);
 
@@ -91,14 +82,9 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mBtnSave = inflate.findViewById(R.id.save_character);
         mBtnAddBonus = inflate.findViewById(R.id.btn_add_bonus);
 
-        mBonusList = inflate.findViewById(R.id.layout_character_bonus);
-        mBonusList.setOnItemClickListener(null);
-        mBonusList.setAdapter(mBonusAdapter);
-        mBonusList.setExpanded(true);
-
         mRadioGroup.setOnCheckedChangeListener(this);
         mBtnSave.setOnClickListener(view -> save());
-        mBtnAddBonus.setOnClickListener(view -> this.addBonus());
+        mBtnAddBonus.setOnClickListener(this::addBonus);
         unrwapArguments();
 
         return inflate;
@@ -118,9 +104,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
                             character -> {
                                 mMainActivity.setTitle(R.string.update_character);
                                 mCharacter = character;
-                                mBonusAdapter.addAll(mCharacter.getBonuses());
-                                mBonusAdapter.notifyDataSetChanged();
-
                                 mEdtName.setText(mCharacter.getName());
                                 mEdtRace.setText(mCharacter.getRace());
                                 String preferredAttack = mCharacter.getPreferredAttack();
@@ -139,14 +122,18 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         }
     }
 
-    private void addBonus() {
+    private void addBonus(View view) {
         setFadeInTransition(mScrollView);
-        mBonusAdapter.add(new CharacterBonusEntity());
+        View layout = LayoutInflater.from(view.getContext()).inflate(R.layout.character_bonus, mLayoutBonus, false);
+        mLayoutBonus.addView(layout);
         Observable
                 .empty()
                 .delay(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(() -> mScrollView.fullScroll(View.FOCUS_DOWN))
+                .doOnComplete(() -> {
+                    mScrollView.fullScroll(View.FOCUS_DOWN);
+                    layout.findViewById(R.id.character_bonus_description).requestFocus();
+                })
                 .subscribe();
     }
 
@@ -175,9 +162,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         setLoading(true);
         mCharacter.setName(mEdtName.getText().toString());
         mCharacter.setRace(mEdtRace.getText().toString());
-
-        mCharacter.getBonuses().removeAll(new ArrayList<CharacterBonus>());
-        mCharacter.getBonuses().addAll(mBonusAdapter.getAllItems());
 
         ReactiveEntityStore<Persistable> dataStore = mMainActivity.getDatabase().getDataStore();
 
