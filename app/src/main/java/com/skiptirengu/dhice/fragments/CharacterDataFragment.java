@@ -1,6 +1,7 @@
 package com.skiptirengu.dhice.fragments;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.storage.CharacterEntity;
+import com.skiptirengu.dhice.viewmodel.CharacterDataViewModel;
 import com.transitionseverywhere.TransitionManager;
 
 import java.util.Objects;
@@ -51,6 +53,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private Button mBtnSave;
     private Button mBtnAddBonus;
 
+    private CharacterDataViewModel mViewModel;
     private Character mCharacter;
 
     public CharacterDataFragment() {
@@ -62,6 +65,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         super.onCreate(savedInstanceState);
         mMainActivity = Objects.requireNonNull((MainActivity) getActivity());
         mCharacter = new CharacterEntity();
+        mViewModel = ViewModelProviders.of(this).get(CharacterDataViewModel.class);
     }
 
     @Override
