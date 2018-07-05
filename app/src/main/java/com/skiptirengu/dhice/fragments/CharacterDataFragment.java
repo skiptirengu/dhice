@@ -2,6 +2,7 @@ package com.skiptirengu.dhice.fragments;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.ScrollView;
@@ -19,14 +19,18 @@ import android.widget.Toast;
 
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
+import com.skiptirengu.dhice.databinding.CharacterDataFragmentBinding;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.storage.CharacterEntity;
 import com.skiptirengu.dhice.viewmodel.CharacterDataViewModel;
+import com.skiptirengu.dhice.viewmodel.ViewModelResponse;
 import com.transitionseverywhere.TransitionManager;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -40,19 +44,25 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private static final String USE_SPELL = "spells";
     private static final String USE_ATTACK = "attacks";
 
-    private RadioGroup mRadioGroup;
-    private RadioButton mRadioSpell;
-    private RadioButton mRadioAttack;
-    private MainActivity mMainActivity;
-    private View mProgress;
-    private ViewGroup mMainLayout;
-    private ViewGroup mLayoutBonus;
-    private ScrollView mScrollView;
-    private AppCompatEditText mEdtName;
-    private AppCompatEditText mEdtRace;
-    private Button mBtnSave;
-    private Button mBtnAddBonus;
+    @BindView(R.id.progress_bar)
+    protected View mProgress;
+    @BindView(R.id.layout_character_data)
+    protected ViewGroup mMainLayout;
+    @BindView(R.id.layout_character_bonus)
+    protected ViewGroup mLayoutBonus;
+    @BindView(R.id.character_data_scrollview)
+    protected ScrollView mScrollView;
+    @BindView(R.id.character_name)
+    protected AppCompatEditText mEdtName;
+    @BindView(R.id.character_race)
+    protected AppCompatEditText mEdtRace;
+    @BindView(R.id.save_character)
+    protected Button mBtnSave;
+    @BindView(R.id.btn_add_bonus)
+    protected Button mBtnAddBonus;
 
+    private MainActivity mMainActivity;
+    private CharacterDataFragmentBinding mBinding;
     private CharacterDataViewModel mViewModel;
     private Character mCharacter;
 
@@ -70,65 +80,39 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View inflate = inflater.inflate(R.layout.fragment_character_data, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.character_data_fragment, container, false);
+        ButterKnife.bind(this, mBinding.getRoot());
 
-        mMainLayout = inflate.findViewById(R.id.layout_character_data);
-        mProgress = inflate.findViewById(R.id.progress_bar);
-        mLayoutBonus = inflate.findViewById(R.id.layout_character_bonus);
-        mScrollView = inflate.findViewById(R.id.character_data_scrollview);
-        setLoading(true);
+        Bundle arguments = getArguments();
+        mViewModel.setCharacterId(arguments != null ? arguments.getInt("id") : 0);
+        mMainActivity.setTitle(mViewModel.getTitle());
+        mViewModel.response().observe(this, this::processResponse);
+        mViewModel.fetchCharacter();
 
-        mRadioGroup = inflate.findViewById(R.id.character_radio_group);
-        mRadioSpell = inflate.findViewById(R.id.character_use_spells);
-        mRadioAttack = inflate.findViewById(R.id.character_use_attacks);
-        mEdtName = inflate.findViewById(R.id.character_name);
-        mEdtRace = inflate.findViewById(R.id.character_race);
-        mBtnSave = inflate.findViewById(R.id.save_character);
-        mBtnAddBonus = inflate.findViewById(R.id.btn_add_bonus);
-
-        mRadioGroup.setOnCheckedChangeListener(this);
         mBtnSave.setOnClickListener(view -> save());
-        mBtnAddBonus.setOnClickListener(this::addBonus);
-        unrwapArguments();
+        mBtnAddBonus.setOnClickListener(view -> this.addBonus());
 
-        return inflate;
+        return mBinding.getRoot();
     }
 
-    @SuppressLint("CheckResult")
-    private void unrwapArguments() {
-        Bundle arguments = getArguments();
-
-        if (arguments != null && arguments.getBoolean("update")) {
-            mMainActivity
-                    .getDatabase()
-                    .findCharacterById(arguments.getInt("id"))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            character -> {
-                                mMainActivity.setTitle(R.string.update_character);
-                                mCharacter = character;
-                                mEdtName.setText(mCharacter.getName());
-                                mEdtRace.setText(mCharacter.getRace());
-                                String preferredAttack = mCharacter.getPreferredAttack();
-                                if (preferredAttack != null && preferredAttack.equals(USE_ATTACK)) {
-                                    mRadioAttack.setChecked(true);
-                                } else {
-                                    mRadioSpell.setChecked(true);
-                                }
-                            },
-                            Throwable::printStackTrace,
-                            () -> setLoading(false)
-                    );
-        } else {
-            mMainActivity.setTitle(R.string.fragment_title_create_character);
-            setLoading(false);
+    private void processResponse(ViewModelResponse<Character> response) {
+        switch (response.getStatus()) {
+            case LOADING:
+                setLoading(true);
+                break;
+            case SUCCESS:
+                mBinding.setCharacter(response.getData());
+                setLoading(false);
+                break;
+            case ERRORED:
+                Toast.makeText(mMainActivity, R.string.load_error, Toast.LENGTH_LONG).show();
+                onBackPressed();
         }
     }
 
-    private void addBonus(View view) {
+    private void addBonus() {
         setFadeInTransition(mScrollView);
-        View layout = LayoutInflater.from(view.getContext()).inflate(R.layout.character_bonus, mLayoutBonus, false);
+        View layout = getLayoutInflater().inflate(R.layout.character_bonus, mLayoutBonus, false);
         mLayoutBonus.addView(layout);
         Observable
                 .empty()

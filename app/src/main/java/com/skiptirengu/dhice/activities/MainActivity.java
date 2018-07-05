@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         if (topFragmet != null
                 && (topFragmet instanceof OnBackPressedListener)
                 && ((OnBackPressedListener) topFragmet).onMenuItemPressed(itemId)) {
-            return false;
+            return true;
         }
 
         switch (itemId) {

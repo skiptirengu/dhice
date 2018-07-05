@@ -5,7 +5,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_characters">Characters</string>
     <string name="title_roll">Roll</string>
-    <string name="fragment_title_create_character">New character</string>
+    <string name="create_character">New character</string>
     <string name="fragment_title_my_characters">My characters</string>
     <string name="character_icon">Character icon</string>
     <string name="character_name">Name*</string>
@@ -22,6 +22,7 @@
     <string name="description">Description</string>
     <string name="bonus">Bonus</string>
     <string name="delete">Delete</string>
+    <string name="load_error">Unable to load character</string>
     <array name="array_item">
         <item>String</item>
     </array>

@@ -37,7 +37,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View inflate = inflater.inflate(R.layout.fragment_character_list, container, false);
+        View inflate = inflater.inflate(R.layout.character_list_fragment, container, false);
 
         mMainActivity = (MainActivity) getActivity();
         mMainLayout = inflate.findViewById(R.id.layout_character_list);
@@ -74,7 +74,6 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Bundle arguments = new Bundle();
-        arguments.putBoolean("update", true);
         arguments.putInt("id", Objects.requireNonNull(mAdapter.getItem(i)).getId());
         setDataCharacterFragment(arguments);
     }

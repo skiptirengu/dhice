@@ -37,14 +37,6 @@ public class Database {
         return mDataStore;
     }
 
-    public Observable<Character> findCharacterById(int id) {
-        return mDataStore
-                .select(Character.class)
-                .where(CharacterEntity.ID.eq(id))
-                .get()
-                .observable();
-    }
-
     public Observable<Character> findCharacters() {
         return mDataStore
                 .select(Character.class)
