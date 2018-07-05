@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Maybe;
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.requery.Persistable;
@@ -107,18 +107,18 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         final View child = binding.getRoot();
         if (data.isNew()) {
             setFadeInTransition(mScrollView);
-            Maybe.empty()
-                    .delay(300, TimeUnit.MILLISECONDS)
-                    .doOnComplete(() -> {
-                        View viewById = child.findViewById(R.id.character_name);
-                        //TODO fix focus
-                        if (viewById != null)
-                            viewById.requestFocus();
-                    })
+            Completable.timer(300, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnComplete(() -> focusBonus(child))
                     .subscribe();
         }
 
         mLayoutBonus.addView(child);
+    }
+
+    private void focusBonus(final View parent) {
+        mScrollView.fullScroll(View.FOCUS_DOWN);
+        parent.requestFocus();
     }
 
     private void processCharacterResponse(ViewModelResponse<Character> response) {
