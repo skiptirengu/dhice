@@ -11,6 +11,7 @@ import com.skiptirengu.dhice.storage.CharacterBonus;
 import com.skiptirengu.dhice.storage.CharacterBonusEntity;
 import com.skiptirengu.dhice.storage.CharacterEntity;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Maybe;
@@ -23,16 +24,19 @@ public class CharacterDataViewModel extends AndroidViewModel {
     private Character mCharacter;
     private CompositeDisposable mDisposable = new CompositeDisposable();
     private int mCharacterId;
-    private MutableLiveData<ViewModelResponse<Character>> mResponse = new MutableLiveData<>();
+    private MutableLiveData<ViewModelResponse<Character>> mCharacterResponse = new MutableLiveData<>();
+    private MutableLiveData<ViewModelResponse<CharacterBonusResponse>> mBonusResponse = new MutableLiveData<>();
 
     public CharacterDataViewModel(@NonNull android.app.Application application) {
         super(application);
     }
 
-    public CharacterBonus addBonus() {
+    public void addBonus() {
         CharacterBonus bonus = new CharacterBonusEntity();
+        bonus.setBonus(1);
+        bonus.setDescription(UUID.randomUUID().toString());
         mCharacter.getBonuses().add(bonus);
-        return bonus;
+        mBonusResponse.postValue(ViewModelResponse.success(new CharacterBonusResponse(bonus, true)));
     }
 
     public void setCharacterId(int characterId) {
@@ -47,8 +51,12 @@ public class CharacterDataViewModel extends AndroidViewModel {
         return getApplication().getString(isUpdate() ? R.string.update_character : R.string.create_character);
     }
 
-    public MutableLiveData<ViewModelResponse<Character>> response() {
-        return mResponse;
+    public MutableLiveData<ViewModelResponse<Character>> character() {
+        return mCharacterResponse;
+    }
+
+    public MutableLiveData<ViewModelResponse<CharacterBonusResponse>> bonus() {
+        return mBonusResponse;
     }
 
     @Override
@@ -58,33 +66,66 @@ public class CharacterDataViewModel extends AndroidViewModel {
     }
 
     public void fetchCharacter() {
-        Maybe<Character> maybe;
-
-        if (isUpdate()) {
-            maybe = getApp().getDatabase().getDataStore().findByKey(Character.class, mCharacterId);
-        } else {
-            maybe = Maybe.just(new CharacterEntity());
-        }
-
         mDisposable.add(
-                maybe.subscribeOn(Schedulers.io())
-                        .delay(5, TimeUnit.SECONDS)
+                getCharacterMaybe()
+                        .subscribeOn(Schedulers.io())
+                        .delay(2, TimeUnit.SECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe(__ -> mResponse.setValue(ViewModelResponse.loading()))
+                        .doOnSubscribe(disposable -> mCharacterResponse.setValue(ViewModelResponse.loading()))
                         .subscribe(
                                 character -> {
-                                    mCharacter = character;
-                                    mResponse.setValue(ViewModelResponse.success(mCharacter));
+                                    character.getBonuses().add(new CharacterBonusEntity());
+                                    emitBonuses(mCharacter = character);
+                                    mCharacterResponse.setValue(ViewModelResponse.success(mCharacter));
                                 },
                                 throwable -> {
                                     throwable.printStackTrace();
-                                    mResponse.setValue(ViewModelResponse.errored(throwable));
+                                    mCharacterResponse.setValue(ViewModelResponse.errored(throwable));
                                 }
                         )
         );
     }
 
+    private void emitBonuses(Character character) {
+        for (CharacterBonus bonus : character.getBonuses()) {
+            mBonusResponse.postValue(ViewModelResponse.success(new CharacterBonusResponse(bonus)));
+        }
+    }
+
+    private Maybe<Character> getCharacterMaybe() {
+        if (isUpdate()) {
+            return getApp().getDatabase().getDataStore().findByKey(Character.class, mCharacterId);
+        } else {
+            return Maybe.just(new CharacterEntity());
+        }
+    }
+
     private Application getApp() {
         return (Application) getApplication();
+    }
+
+    public class CharacterBonusResponse {
+        @NonNull
+        private final CharacterBonus mBonus;
+        private final boolean mNew;
+
+        CharacterBonusResponse(@NonNull CharacterBonus bonus, boolean isNew) {
+            mNew = isNew;
+            mBonus = bonus;
+        }
+
+        CharacterBonusResponse(@NonNull CharacterBonus bonus) {
+            mBonus = bonus;
+            mNew = false;
+        }
+
+        @NonNull
+        public CharacterBonus getBonus() {
+            return mBonus;
+        }
+
+        public boolean isNew() {
+            return mNew;
+        }
     }
 }

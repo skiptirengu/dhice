@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
+import com.skiptirengu.dhice.databinding.CharacterBonusBinding;
 import com.skiptirengu.dhice.databinding.CharacterDataFragmentBinding;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.storage.CharacterEntity;
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
+import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.requery.Persistable;
@@ -86,7 +87,9 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         Bundle arguments = getArguments();
         mViewModel.setCharacterId(arguments != null ? arguments.getInt("id") : 0);
         mMainActivity.setTitle(mViewModel.getTitle());
-        mViewModel.response().observe(this, this::processResponse);
+
+        mViewModel.bonus().observe(this, this::proccessBonusResponse);
+        mViewModel.character().observe(this, this::processCharacterResponse);
         mViewModel.fetchCharacter();
 
         mBtnSave.setOnClickListener(view -> save());
@@ -95,7 +98,30 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         return mBinding.getRoot();
     }
 
-    private void processResponse(ViewModelResponse<Character> response) {
+    private void proccessBonusResponse(ViewModelResponse<CharacterDataViewModel.CharacterBonusResponse> response) {
+        CharacterDataViewModel.CharacterBonusResponse data = Objects.requireNonNull(response.getData());
+
+        CharacterBonusBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.character_bonus, mLayoutBonus, false);
+        binding.setBonus(data.getBonus());
+
+        final View child = binding.getRoot();
+        if (data.isNew()) {
+            setFadeInTransition(mScrollView);
+            Maybe.empty()
+                    .delay(300, TimeUnit.MILLISECONDS)
+                    .doOnComplete(() -> {
+                        View viewById = child.findViewById(R.id.character_name);
+                        //TODO fix focus
+                        if (viewById != null)
+                            viewById.requestFocus();
+                    })
+                    .subscribe();
+        }
+
+        mLayoutBonus.addView(child);
+    }
+
+    private void processCharacterResponse(ViewModelResponse<Character> response) {
         switch (response.getStatus()) {
             case LOADING:
                 setLoading(true);
@@ -112,17 +138,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
     private void addBonus() {
         setFadeInTransition(mScrollView);
-        View layout = getLayoutInflater().inflate(R.layout.character_bonus, mLayoutBonus, false);
-        mLayoutBonus.addView(layout);
-        Observable
-                .empty()
-                .delay(300, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(() -> {
-                    mScrollView.fullScroll(View.FOCUS_DOWN);
-                    layout.findViewById(R.id.character_bonus_description).requestFocus();
-                })
-                .subscribe();
+        mViewModel.addBonus();
     }
 
     private void setFadeInTransition(ViewGroup viewGroup) {
