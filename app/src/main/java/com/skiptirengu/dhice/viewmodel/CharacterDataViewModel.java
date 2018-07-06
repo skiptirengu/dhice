@@ -11,6 +11,7 @@ import com.skiptirengu.dhice.storage.CharacterBonus;
 import com.skiptirengu.dhice.storage.CharacterBonusEntity;
 import com.skiptirengu.dhice.storage.CharacterEntity;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -24,8 +25,11 @@ public class CharacterDataViewModel extends AndroidViewModel {
     private Character mCharacter;
     private CompositeDisposable mDisposable = new CompositeDisposable();
     private int mCharacterId;
+
     private MutableLiveData<ViewModelResponse<Character>> mCharacterResponse = new MutableLiveData<>();
-    private MutableLiveData<ViewModelResponse<CharacterBonusResponse>> mBonusResponse = new MutableLiveData<>();
+    private MutableLiveData<CharacterBonusResponse> mBonusResponse = new MutableLiveData<>();
+    private MutableLiveData<Integer> mDeleteResponse = new MutableLiveData<>();
+    private MutableLiveData<ViewModelResponse<String>> mSaveResponse = new MutableLiveData<>();
 
     public CharacterDataViewModel(@NonNull android.app.Application application) {
         super(application);
@@ -35,8 +39,10 @@ public class CharacterDataViewModel extends AndroidViewModel {
         CharacterBonus bonus = new CharacterBonusEntity();
         bonus.setBonus(1);
         bonus.setDescription(UUID.randomUUID().toString());
-        mCharacter.getBonuses().add(bonus);
-        mBonusResponse.postValue(ViewModelResponse.success(new CharacterBonusResponse(bonus, true)));
+
+        List<CharacterBonus> bonusList = mCharacter.getBonuses();
+        bonusList.add(bonus);
+        mBonusResponse.postValue(new CharacterBonusResponse(bonus, bonusList.size() - 1, true));
     }
 
     public void setCharacterId(int characterId) {
@@ -55,14 +61,36 @@ public class CharacterDataViewModel extends AndroidViewModel {
         return mCharacterResponse;
     }
 
-    public MutableLiveData<ViewModelResponse<CharacterBonusResponse>> bonus() {
+    public MutableLiveData<CharacterBonusResponse> bonus() {
         return mBonusResponse;
+    }
+
+    public MutableLiveData<ViewModelResponse<String>> save() {
+        return mSaveResponse;
+    }
+
+    public MutableLiveData<Integer> delete() {
+        return mDeleteResponse;
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
         mDisposable.dispose();
+    }
+
+    public void saveCharacter() {
+        mDisposable.add(
+                getApp().getDatabase()
+                        .getDataStore()
+                        .upsert(mCharacter)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(disposable -> mSaveResponse.setValue(ViewModelResponse.loading()))
+                        .doOnSuccess(character -> mSaveResponse.setValue(ViewModelResponse.success(getSaveString())))
+                        .doOnError(throwable -> mSaveResponse.setValue(ViewModelResponse.errored(throwable)))
+                        .subscribe()
+        );
     }
 
     public void fetchCharacter() {
@@ -87,8 +115,9 @@ public class CharacterDataViewModel extends AndroidViewModel {
     }
 
     private void emitBonuses(Character character) {
-        for (CharacterBonus bonus : character.getBonuses()) {
-            mBonusResponse.postValue(ViewModelResponse.success(new CharacterBonusResponse(bonus)));
+        List<CharacterBonus> bonusList = character.getBonuses();
+        for (int i = 0; i < bonusList.size(); i++) {
+            mBonusResponse.setValue(new CharacterBonusResponse(bonusList.get(i), i));
         }
     }
 
@@ -104,19 +133,31 @@ public class CharacterDataViewModel extends AndroidViewModel {
         return (Application) getApplication();
     }
 
+    public void removeBonus(int index) {
+        mCharacter.getBonuses().remove(index);
+        mDeleteResponse.postValue(index);
+    }
+
+    private String getSaveString() {
+        return getApp().getString(R.string.character_saved);
+    }
+
     public class CharacterBonusResponse {
         @NonNull
         private final CharacterBonus mBonus;
         private final boolean mNew;
+        private final int mIndex;
 
-        CharacterBonusResponse(@NonNull CharacterBonus bonus, boolean isNew) {
+        CharacterBonusResponse(@NonNull CharacterBonus bonus, int index, boolean isNew) {
             mNew = isNew;
             mBonus = bonus;
+            mIndex = index;
         }
 
-        CharacterBonusResponse(@NonNull CharacterBonus bonus) {
+        CharacterBonusResponse(@NonNull CharacterBonus bonus, int index) {
             mBonus = bonus;
             mNew = false;
+            mIndex = index;
         }
 
         @NonNull
@@ -126,6 +167,10 @@ public class CharacterDataViewModel extends AndroidViewModel {
 
         public boolean isNew() {
             return mNew;
+        }
+
+        public int getIndex() {
+            return mIndex;
         }
     }
 }

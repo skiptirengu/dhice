@@ -22,7 +22,6 @@ import com.skiptirengu.dhice.activities.MainActivity;
 import com.skiptirengu.dhice.databinding.CharacterBonusBinding;
 import com.skiptirengu.dhice.databinding.CharacterDataFragmentBinding;
 import com.skiptirengu.dhice.storage.Character;
-import com.skiptirengu.dhice.storage.CharacterEntity;
 import com.skiptirengu.dhice.viewmodel.CharacterDataViewModel;
 import com.skiptirengu.dhice.viewmodel.ViewModelResponse;
 import com.transitionseverywhere.TransitionManager;
@@ -34,9 +33,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import io.requery.Persistable;
-import io.requery.reactivex.ReactiveEntityStore;
 
 /**
  * {@link Fragment}
@@ -65,7 +61,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private MainActivity mMainActivity;
     private CharacterDataFragmentBinding mBinding;
     private CharacterDataViewModel mViewModel;
-    private Character mCharacter;
 
     public CharacterDataFragment() {
         // Required empty public constructor
@@ -75,7 +70,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMainActivity = Objects.requireNonNull((MainActivity) getActivity());
-        mCharacter = new CharacterEntity();
         mViewModel = ViewModelProviders.of(this).get(CharacterDataViewModel.class);
     }
 
@@ -90,6 +84,8 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
         mViewModel.bonus().observe(this, this::proccessBonusResponse);
         mViewModel.character().observe(this, this::processCharacterResponse);
+        mViewModel.delete().observe(this, this::processRemoveBonusResponse);
+        mViewModel.save().observe(this, this::proccessSaveResponse);
         mViewModel.fetchCharacter();
 
         mBtnSave.setOnClickListener(view -> save());
@@ -98,15 +94,33 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         return mBinding.getRoot();
     }
 
-    private void proccessBonusResponse(ViewModelResponse<CharacterDataViewModel.CharacterBonusResponse> response) {
-        CharacterDataViewModel.CharacterBonusResponse data = Objects.requireNonNull(response.getData());
+    private void processRemoveBonusResponse(Integer index) {
+        TransitionManager.beginDelayedTransition(mLayoutBonus);
+        mLayoutBonus.removeViewAt(index);
+        updateDeleteListeners();
+    }
 
+    private void updateDeleteListeners() {
+        for (int index = 0; index < mLayoutBonus.getChildCount(); index++) {
+            int finalIndex = index;
+            mLayoutBonus
+                    .getChildAt(index)
+                    .findViewById(R.id.btn_delete_bonus)
+                    .setOnClickListener(view -> mViewModel.removeBonus(finalIndex));
+        }
+    }
+
+    private void proccessBonusResponse(CharacterDataViewModel.CharacterBonusResponse data) {
         CharacterBonusBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.character_bonus, mLayoutBonus, false);
-        binding.setBonus(data.getBonus());
 
         final View child = binding.getRoot();
+        final int index = data.getIndex();
+        binding.setBonus(data.getBonus());
+
+        child.findViewById(R.id.btn_delete_bonus).setOnClickListener(view -> mViewModel.removeBonus(index));
+
         if (data.isNew()) {
-            setFadeInTransition(mScrollView);
+            addFadeTransition(mScrollView);
             Completable.timer(300, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnComplete(() -> focusBonus(child))
@@ -136,12 +150,27 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         }
     }
 
+    private void proccessSaveResponse(ViewModelResponse<String> response) {
+        switch (response.getStatus()) {
+            case LOADING:
+                setLoading(true);
+                break;
+            case SUCCESS:
+                onBackPressed();
+                Toast.makeText(mMainActivity, response.getData(), Toast.LENGTH_SHORT).show();
+                break;
+            case ERRORED:
+                Toast.makeText(mMainActivity, R.string.character_save_error, Toast.LENGTH_LONG).show();
+                setLoading(false);
+                break;
+        }
+    }
+
     private void addBonus() {
-        setFadeInTransition(mScrollView);
         mViewModel.addBonus();
     }
 
-    private void setFadeInTransition(ViewGroup viewGroup) {
+    private void addFadeTransition(ViewGroup viewGroup) {
         TransitionManager.beginDelayedTransition(viewGroup);
     }
 
@@ -163,25 +192,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
             return;
         }
 
-        setLoading(true);
-        mCharacter.setName(mEdtName.getText().toString());
-        mCharacter.setRace(mEdtRace.getText().toString());
-
-        ReactiveEntityStore<Persistable> dataStore = mMainActivity.getDatabase().getDataStore();
-
-        dataStore.upsert(mCharacter)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        val -> {
-                            this.returnToList();
-                            setLoading(false);
-                        },
-                        err -> {
-                            err.printStackTrace();
-                            setLoading(false);
-                        }
-                );
+        mViewModel.saveCharacter();
     }
 
     private void setLoading(boolean loading) {
@@ -194,19 +205,12 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         }
     }
 
-    private void returnToList() {
-        Toast.makeText(mMainActivity, R.string.character_saved, Toast.LENGTH_SHORT).show();
-        mMainActivity.getSupportFragmentManager().popBackStack();
-    }
-
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int i) {
         switch (i) {
             case R.id.character_use_spells:
-                mCharacter.setPreferredAttack(USE_SPELL);
                 break;
             case R.id.character_use_attacks:
-                mCharacter.setPreferredAttack(USE_ATTACK);
                 break;
         }
     }
