@@ -102,8 +102,8 @@ public class CharacterDataViewModel extends AndroidViewModel {
                         .doOnSubscribe(disposable -> mCharacterResponse.setValue(ViewModelResponse.loading()))
                         .subscribe(
                                 character -> {
-                                    character.getBonuses().add(new CharacterBonusEntity());
-                                    emitBonuses(mCharacter = character);
+                                    mCharacter = character;
+                                    emitBonuses(mCharacter);
                                     mCharacterResponse.setValue(ViewModelResponse.success(mCharacter));
                                 },
                                 throwable -> {
