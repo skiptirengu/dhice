@@ -12,7 +12,6 @@ import com.skiptirengu.dhice.storage.CharacterBonusEntity;
 import com.skiptirengu.dhice.storage.CharacterEntity;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Maybe;
@@ -37,9 +36,6 @@ public class CharacterDataViewModel extends AndroidViewModel {
 
     public void addBonus() {
         CharacterBonus bonus = new CharacterBonusEntity();
-        bonus.setBonus(1);
-        bonus.setDescription(UUID.randomUUID().toString());
-
         List<CharacterBonus> bonusList = mCharacter.getBonuses();
         bonusList.add(bonus);
         mBonusResponse.postValue(new CharacterBonusResponse(bonus, bonusList.size() - 1, true));

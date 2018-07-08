@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="com.skiptirengu.dhice.util.Conv" />
+
         <variable
             name="bonus"
             type="com.skiptirengu.dhice.storage.CharacterBonus" />
@@ -40,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/description"
                     android:inputType="textCapSentences"
-                    android:text="@{bonus.description}" />
+                    android:text="@={bonus.description}" />
             </android.support.design.widget.TextInputLayout>
 
             <LinearLayout
@@ -91,7 +93,7 @@
                             android:layout_height="wrap_content"
                             android:hint="@string/bonus"
                             android:inputType="numberDecimal"
-                            android:text="@{String.valueOf(bonus.bonus)}" />
+                            android:text="@={Conv.intToString(bonus.bonus)}" />
                     </android.support.design.widget.TextInputLayout>
 
                 </LinearLayout>

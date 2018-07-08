@@ -39,7 +39,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/character_name"
                         android:inputType="textCapSentences"
-                        android:text="@{character.name}" />
+                        android:text="@={character.name}" />
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout
@@ -54,7 +54,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/character_race"
                         android:inputType="textCapSentences"
-                        android:text="@{character.race}" />
+                        android:text="@={character.race}" />
                 </android.support.design.widget.TextInputLayout>
 
                 <RadioGroup
