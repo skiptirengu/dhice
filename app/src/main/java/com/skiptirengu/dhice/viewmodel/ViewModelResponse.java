@@ -5,11 +5,11 @@ import android.support.annotation.Nullable;
 
 public class ViewModelResponse<T> {
     @NonNull
-    private Status mStatus;
+    private final Status mStatus;
     @Nullable
-    private T mData;
+    private final T mData;
     @Nullable
-    private Throwable mError;
+    private final Throwable mError;
 
     private ViewModelResponse(@NonNull Status status, @Nullable T data, @Nullable Throwable error) {
         this.mStatus = status;

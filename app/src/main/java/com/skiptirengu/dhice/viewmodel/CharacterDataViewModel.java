@@ -93,7 +93,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
         mDisposable.add(
                 getCharacterMaybe()
                         .subscribeOn(Schedulers.io())
-                        .delay(2, TimeUnit.SECONDS)
+                        .delay(300, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe(disposable -> mCharacterResponse.setValue(ViewModelResponse.loading()))
                         .subscribe(

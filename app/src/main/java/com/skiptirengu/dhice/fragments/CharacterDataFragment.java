@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.skiptirengu.dhice.databinding.CharacterDataFragmentBinding;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.viewmodel.CharacterDataViewModel;
 import com.skiptirengu.dhice.viewmodel.ViewModelResponse;
+import com.transitionseverywhere.Slide;
 import com.transitionseverywhere.TransitionManager;
 
 import java.util.Objects;
@@ -95,7 +97,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     }
 
     private void processRemoveBonusResponse(Integer index) {
-        TransitionManager.beginDelayedTransition(mLayoutBonus);
+        addViewTransition(mLayoutBonus);
         mLayoutBonus.removeViewAt(index);
         updateDeleteListeners();
     }
@@ -120,7 +122,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         child.findViewById(R.id.btn_delete_bonus).setOnClickListener(view -> mViewModel.removeBonus(index));
 
         if (data.isNew()) {
-            addFadeTransition(mScrollView);
+            addViewTransition(mScrollView);
             Completable.timer(300, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnComplete(() -> focusBonus(child))
@@ -170,8 +172,8 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mViewModel.addBonus();
     }
 
-    private void addFadeTransition(ViewGroup viewGroup) {
-        TransitionManager.beginDelayedTransition(viewGroup);
+    private void addViewTransition(ViewGroup viewGroup) {
+        TransitionManager.beginDelayedTransition(viewGroup, new Slide(Gravity.END));
     }
 
     @SuppressLint("CheckResult")

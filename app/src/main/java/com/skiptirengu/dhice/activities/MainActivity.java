@@ -94,10 +94,13 @@ public class MainActivity extends AppCompatActivity {
 
     public synchronized void setFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_left, R.anim.enter_from_right, R.anim.exit_to_right);
         transaction.replace(mContainer.getId(), fragment);
+
         if (addToBackStack) {
             transaction.addToBackStack(fragment.getClass().getCanonicalName());
         }
+
         transaction.commit();
     }
 
