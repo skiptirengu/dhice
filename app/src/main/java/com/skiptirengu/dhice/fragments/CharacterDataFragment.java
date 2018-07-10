@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,23 +17,20 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.activities.MainActivity;
 import com.skiptirengu.dhice.databinding.CharacterBonusBinding;
 import com.skiptirengu.dhice.databinding.CharacterDataFragmentBinding;
 import com.skiptirengu.dhice.storage.Character;
+import com.skiptirengu.dhice.util.Animations;
 import com.skiptirengu.dhice.viewmodel.CharacterDataViewModel;
 import com.skiptirengu.dhice.viewmodel.ViewModelResponse;
-import com.transitionseverywhere.Slide;
-import com.transitionseverywhere.TransitionManager;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Completable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * {@link Fragment}
@@ -97,12 +93,14 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     }
 
     private void processRemoveBonusResponse(Integer index) {
-        addViewTransition(mLayoutBonus);
-        mLayoutBonus.removeViewAt(index);
-        updateDeleteListeners();
+        final View childAt = mLayoutBonus.getChildAt(index);
+        Animations.delayed(Techniques.SlideOutRight, childAt, animator -> {
+            mLayoutBonus.removeView(childAt);
+            updateDeleteListeners();
+        });
     }
 
-    private void updateDeleteListeners() {
+    private synchronized void updateDeleteListeners() {
         for (int index = 0; index < mLayoutBonus.getChildCount(); index++) {
             int finalIndex = index;
             mLayoutBonus
@@ -120,16 +118,11 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         binding.setBonus(data.getBonus());
 
         child.findViewById(R.id.btn_delete_bonus).setOnClickListener(view -> mViewModel.removeBonus(index));
+        mLayoutBonus.addView(child);
 
         if (data.isNew()) {
-            addViewTransition(mScrollView);
-            Completable.timer(300, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnComplete(() -> focusBonus(child))
-                    .subscribe();
+            Animations.delayed(Techniques.SlideInLeft, child, animator -> focusBonus(child));
         }
-
-        mLayoutBonus.addView(child);
     }
 
     private void focusBonus(final View parent) {
@@ -170,10 +163,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
     private void addBonus() {
         mViewModel.addBonus();
-    }
-
-    private void addViewTransition(ViewGroup viewGroup) {
-        TransitionManager.beginDelayedTransition(viewGroup, new Slide(Gravity.END));
     }
 
     @SuppressLint("CheckResult")
