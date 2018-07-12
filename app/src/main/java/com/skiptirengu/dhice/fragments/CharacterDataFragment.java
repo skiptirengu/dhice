@@ -69,6 +69,10 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         super.onCreate(savedInstanceState);
         mMainActivity = Objects.requireNonNull((MainActivity) getActivity());
         mViewModel = ViewModelProviders.of(this).get(CharacterDataViewModel.class);
+        mViewModel.bonus().observe(this, this::proccessBonusResponse);
+        mViewModel.character().observe(this, this::processCharacterResponse);
+        mViewModel.delete().observe(this, this::processRemoveBonusResponse);
+        mViewModel.save().observe(this, this::proccessSaveResponse);
     }
 
     @Override
@@ -79,20 +83,14 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         Bundle arguments = getArguments();
         mViewModel.setCharacterId(arguments != null ? arguments.getInt("id") : 0);
         mMainActivity.setTitle(mViewModel.getTitle());
-
-        mViewModel.bonus().observe(this, this::proccessBonusResponse);
-        mViewModel.character().observe(this, this::processCharacterResponse);
-        mViewModel.delete().observe(this, this::processRemoveBonusResponse);
-        mViewModel.save().observe(this, this::proccessSaveResponse);
-        mViewModel.fetchCharacter();
-
         mBtnSave.setOnClickListener(view -> save());
         mBtnAddBonus.setOnClickListener(view -> this.addBonus());
+        mViewModel.fetchCharacter();
 
         return mBinding.getRoot();
     }
 
-    private void processRemoveBonusResponse(Integer index) {
+    private void processRemoveBonusResponse(String index) {
         final View childAt = (View) mLayoutBonus.findViewWithTag(index).getParent();
         Animations.delayed(Techniques.SlideOutRight, childAt, animator -> mLayoutBonus.removeView(childAt));
     }
@@ -105,7 +103,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
         deleteBtn.setTag(data.getTag());
         binding.setBonus(data.getBonus());
-        deleteBtn.setOnClickListener(view -> mViewModel.removeBonus((Integer) view.getTag()));
+        deleteBtn.setOnClickListener(view -> mViewModel.removeBonus((String) view.getTag()));
         mLayoutBonus.addView(child);
 
         if (data.isNew()) {

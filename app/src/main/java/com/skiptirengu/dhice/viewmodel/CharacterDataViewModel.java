@@ -27,7 +27,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
 
     private MutableLiveData<ViewModelResponse<Character>> mCharacterResponse = new MutableLiveData<>();
     private MutableLiveData<CharacterBonusResponse> mBonusResponse = new MutableLiveData<>();
-    private MutableLiveData<Integer> mDeleteResponse = new MutableLiveData<>();
+    private MutableLiveData<String> mDeleteResponse = new MutableLiveData<>();
     private MutableLiveData<ViewModelResponse<String>> mSaveResponse = new MutableLiveData<>();
 
     public CharacterDataViewModel(@NonNull android.app.Application application) {
@@ -38,7 +38,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
         CharacterBonus bonus = new CharacterBonusEntity();
         List<CharacterBonus> bonusList = mCharacter.getBonuses();
         bonusList.add(bonus);
-        mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.nativeHashCode(), true));
+        mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.uniqueId(), true));
     }
 
     public void setCharacterId(int characterId) {
@@ -65,7 +65,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
         return mSaveResponse;
     }
 
-    public MutableLiveData<Integer> delete() {
+    public MutableLiveData<String> delete() {
         return mDeleteResponse;
     }
 
@@ -114,7 +114,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
         List<CharacterBonus> bonusList = character.getBonuses();
         for (int i = 0; i < bonusList.size(); i++) {
             CharacterBonus bonus = bonusList.get(i);
-            mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.nativeHashCode()));
+            mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.uniqueId()));
         }
     }
 
@@ -130,10 +130,10 @@ public class CharacterDataViewModel extends AndroidViewModel {
         return (Application) getApplication();
     }
 
-    public synchronized void removeBonus(final int tag) {
+    public synchronized void removeBonus(final String tag) {
         List<CharacterBonus> bonusList = mCharacter.getBonuses();
         for (CharacterBonus bonus : bonusList) {
-            if (bonus.nativeHashCode() == tag) {
+            if (bonus.uniqueId().equals(tag)) {
                 bonusList.remove(bonus);
                 mDeleteResponse.setValue(tag);
                 break;
@@ -149,15 +149,15 @@ public class CharacterDataViewModel extends AndroidViewModel {
         @NonNull
         private final CharacterBonus mBonus;
         private final boolean mNew;
-        private final int mTag;
+        private final String mTag;
 
-        CharacterBonusResponse(@NonNull CharacterBonus bonus, int tag, boolean isNew) {
+        CharacterBonusResponse(@NonNull CharacterBonus bonus, String tag, boolean isNew) {
             mNew = isNew;
             mBonus = bonus;
             mTag = tag;
         }
 
-        CharacterBonusResponse(@NonNull CharacterBonus bonus, int tag) {
+        CharacterBonusResponse(@NonNull CharacterBonus bonus, String tag) {
             mBonus = bonus;
             mNew = false;
             mTag = tag;
@@ -172,7 +172,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
             return mNew;
         }
 
-        public int getTag() {
+        public String getTag() {
             return mTag;
         }
     }
