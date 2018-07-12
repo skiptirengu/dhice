@@ -1,7 +1,7 @@
 package com.skiptirengu.dhice.storage;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.databinding.Observable;
 import android.os.Parcelable;
 
 import java.util.List;
@@ -14,26 +14,26 @@ import io.requery.OneToMany;
 import io.requery.Persistable;
 
 @Entity
-public interface Character extends Persistable, Parcelable, Observable {
+public abstract class Character extends BaseObservable implements Persistable, Parcelable {
     @Key
     @Generated
-    int getId();
+    public abstract int getId();
 
     @Bindable
-    String getName();
+    public abstract String getName();
 
-    void setName(String val);
-
-    @Bindable
-    String getRace();
-
-    void setRace(String val);
+    public abstract void setName(String val);
 
     @Bindable
-    String getPreferredAttack();
+    public abstract String getRace();
 
-    void setPreferredAttack(String val);
+    public abstract void setRace(String val);
+
+    @Bindable
+    public abstract String getPreferredAttack();
+
+    public abstract void setPreferredAttack(String val);
 
     @OneToMany(mappedBy = "character", cascade = {CascadeAction.DELETE, CascadeAction.SAVE})
-    List<CharacterBonus> getBonuses();
+    public abstract List<CharacterBonus> getBonuses();
 }

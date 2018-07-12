@@ -34,11 +34,11 @@ public class CharacterDataViewModel extends AndroidViewModel {
         super(application);
     }
 
-    public void addBonus() {
+    public synchronized void addBonus() {
         CharacterBonus bonus = new CharacterBonusEntity();
         List<CharacterBonus> bonusList = mCharacter.getBonuses();
         bonusList.add(bonus);
-        mBonusResponse.postValue(new CharacterBonusResponse(bonus, bonusList.size() - 1, true));
+        mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.nativeHashCode(), true));
     }
 
     public void setCharacterId(int characterId) {
@@ -110,10 +110,11 @@ public class CharacterDataViewModel extends AndroidViewModel {
         );
     }
 
-    private void emitBonuses(Character character) {
+    private synchronized void emitBonuses(Character character) {
         List<CharacterBonus> bonusList = character.getBonuses();
         for (int i = 0; i < bonusList.size(); i++) {
-            mBonusResponse.setValue(new CharacterBonusResponse(bonusList.get(i), i));
+            CharacterBonus bonus = bonusList.get(i);
+            mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.nativeHashCode()));
         }
     }
 
@@ -129,9 +130,15 @@ public class CharacterDataViewModel extends AndroidViewModel {
         return (Application) getApplication();
     }
 
-    public void removeBonus(int index) {
-        mCharacter.getBonuses().remove(index);
-        mDeleteResponse.postValue(index);
+    public synchronized void removeBonus(final int tag) {
+        List<CharacterBonus> bonusList = mCharacter.getBonuses();
+        for (CharacterBonus bonus : bonusList) {
+            if (bonus.nativeHashCode() == tag) {
+                bonusList.remove(bonus);
+                mDeleteResponse.setValue(tag);
+                break;
+            }
+        }
     }
 
     private String getSaveString() {
@@ -142,18 +149,18 @@ public class CharacterDataViewModel extends AndroidViewModel {
         @NonNull
         private final CharacterBonus mBonus;
         private final boolean mNew;
-        private final int mIndex;
+        private final int mTag;
 
-        CharacterBonusResponse(@NonNull CharacterBonus bonus, int index, boolean isNew) {
+        CharacterBonusResponse(@NonNull CharacterBonus bonus, int tag, boolean isNew) {
             mNew = isNew;
             mBonus = bonus;
-            mIndex = index;
+            mTag = tag;
         }
 
-        CharacterBonusResponse(@NonNull CharacterBonus bonus, int index) {
+        CharacterBonusResponse(@NonNull CharacterBonus bonus, int tag) {
             mBonus = bonus;
             mNew = false;
-            mIndex = index;
+            mTag = tag;
         }
 
         @NonNull
@@ -165,8 +172,8 @@ public class CharacterDataViewModel extends AndroidViewModel {
             return mNew;
         }
 
-        public int getIndex() {
-            return mIndex;
+        public int getTag() {
+            return mTag;
         }
     }
 }

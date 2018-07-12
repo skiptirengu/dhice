@@ -93,31 +93,19 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     }
 
     private void processRemoveBonusResponse(Integer index) {
-        final View childAt = mLayoutBonus.getChildAt(index);
-        Animations.delayed(Techniques.SlideOutRight, childAt, animator -> {
-            mLayoutBonus.removeView(childAt);
-            updateDeleteListeners();
-        });
-    }
-
-    private synchronized void updateDeleteListeners() {
-        for (int index = 0; index < mLayoutBonus.getChildCount(); index++) {
-            int finalIndex = index;
-            mLayoutBonus
-                    .getChildAt(index)
-                    .findViewById(R.id.btn_delete_bonus)
-                    .setOnClickListener(view -> mViewModel.removeBonus(finalIndex));
-        }
+        final View childAt = (View) mLayoutBonus.findViewWithTag(index).getParent();
+        Animations.delayed(Techniques.SlideOutRight, childAt, animator -> mLayoutBonus.removeView(childAt));
     }
 
     private void proccessBonusResponse(CharacterDataViewModel.CharacterBonusResponse data) {
         CharacterBonusBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.character_bonus, mLayoutBonus, false);
 
         final View child = binding.getRoot();
-        final int index = data.getIndex();
-        binding.setBonus(data.getBonus());
+        final View deleteBtn = child.findViewById(R.id.btn_delete_bonus);
 
-        child.findViewById(R.id.btn_delete_bonus).setOnClickListener(view -> mViewModel.removeBonus(index));
+        deleteBtn.setTag(data.getTag());
+        binding.setBonus(data.getBonus());
+        deleteBtn.setOnClickListener(view -> mViewModel.removeBonus((Integer) view.getTag()));
         mLayoutBonus.addView(child);
 
         if (data.isNew()) {

@@ -1,7 +1,7 @@
 package com.skiptirengu.dhice.storage;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.databinding.Observable;
 import android.os.Parcelable;
 
 import io.requery.Entity;
@@ -9,28 +9,34 @@ import io.requery.Generated;
 import io.requery.Key;
 import io.requery.ManyToOne;
 import io.requery.Persistable;
+import io.requery.Transient;
 
 @Entity
-public interface CharacterBonus extends Persistable, Parcelable, Observable {
+public abstract class CharacterBonus extends BaseObservable implements Persistable, Parcelable {
     @Key
     @Generated
-    int getId();
+    public abstract int getId();
 
     @Bindable
-    String getDescription();
+    public abstract String getDescription();
 
-    void setDescription(String val);
-
-    @Bindable
-    int getBonus();
-
-    void setBonus(int val);
+    public abstract void setDescription(String val);
 
     @Bindable
-    String getType();
+    public abstract int getBonus();
 
-    void setType(String type);
+    public abstract void setBonus(int val);
+
+    @Bindable
+    public abstract String getType();
+
+    public abstract void setType(String type);
 
     @ManyToOne
-    Character getCharacter();
+    public abstract Character getCharacter();
+
+    @Transient
+    public final int nativeHashCode() {
+        return super.hashCode();
+    }
 }
