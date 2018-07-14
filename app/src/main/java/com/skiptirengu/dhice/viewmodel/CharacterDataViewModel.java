@@ -11,7 +11,7 @@ import com.skiptirengu.dhice.storage.CharacterBonus;
 import com.skiptirengu.dhice.storage.CharacterBonusEntity;
 import com.skiptirengu.dhice.storage.CharacterEntity;
 
-import java.util.List;
+import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Maybe;
@@ -24,6 +24,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
     private Character mCharacter;
     private CompositeDisposable mDisposable = new CompositeDisposable();
     private int mCharacterId;
+    private LinkedList<CharacterBonus> mBonusList = new LinkedList<>();
 
     private MutableLiveData<ViewModelResponse<Character>> mCharacterResponse = new MutableLiveData<>();
     private MutableLiveData<CharacterBonusResponse> mBonusResponse = new MutableLiveData<>();
@@ -36,8 +37,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
 
     public synchronized void addBonus() {
         CharacterBonus bonus = new CharacterBonusEntity();
-        List<CharacterBonus> bonusList = mCharacter.getBonuses();
-        bonusList.add(bonus);
+        mBonusList.addFirst(bonus);
         mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.uniqueId(), true));
     }
 
@@ -75,7 +75,9 @@ public class CharacterDataViewModel extends AndroidViewModel {
         mDisposable.dispose();
     }
 
-    public void saveCharacter() {
+    public synchronized void saveCharacter() {
+        mCharacter.getBonuses().clear();
+        mCharacter.getBonuses().addAll(mBonusList);
         mDisposable.add(
                 getApp().getDatabase()
                         .getDataStore()
@@ -99,8 +101,9 @@ public class CharacterDataViewModel extends AndroidViewModel {
                         .subscribe(
                                 character -> {
                                     mCharacter = character;
-                                    emitBonuses(mCharacter);
+                                    mBonusList = new LinkedList<>(character.getBonuses());
                                     mCharacterResponse.setValue(ViewModelResponse.success(mCharacter));
+                                    emitBonuses();
                                 },
                                 throwable -> {
                                     throwable.printStackTrace();
@@ -110,10 +113,9 @@ public class CharacterDataViewModel extends AndroidViewModel {
         );
     }
 
-    private synchronized void emitBonuses(Character character) {
-        List<CharacterBonus> bonusList = character.getBonuses();
-        for (int i = 0; i < bonusList.size(); i++) {
-            CharacterBonus bonus = bonusList.get(i);
+    private synchronized void emitBonuses() {
+        for (int i = 0; i < mBonusList.size(); i++) {
+            CharacterBonus bonus = mBonusList.get(i);
             mBonusResponse.setValue(new CharacterBonusResponse(bonus, bonus.uniqueId()));
         }
     }
@@ -131,10 +133,10 @@ public class CharacterDataViewModel extends AndroidViewModel {
     }
 
     public synchronized void removeBonus(final String tag) {
-        List<CharacterBonus> bonusList = mCharacter.getBonuses();
-        for (CharacterBonus bonus : bonusList) {
+        for (int index = 0; index < mBonusList.size(); index++) {
+            CharacterBonus bonus = mBonusList.get(index);
             if (bonus.uniqueId().equals(tag)) {
-                bonusList.remove(bonus);
+                mBonusList.remove(index);
                 mDeleteResponse.setValue(tag);
                 break;
             }

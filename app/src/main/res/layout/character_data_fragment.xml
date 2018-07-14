@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="character"
             type="com.skiptirengu.dhice.storage.Character" />
@@ -61,7 +62,6 @@
                     android:id="@+id/character_radio_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin"
                     android:layout_marginLeft="@dimen/margin_3"
                     android:layout_marginStart="@dimen/margin_3"
                     android:layout_marginTop="@dimen/activity_vertical_margin_md"
@@ -87,11 +87,12 @@
                         android:text="@string/weapon_attacks" />
                 </RadioGroup>
 
-                <LinearLayout
-                    android:id="@+id/layout_character_bonus"
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:background="@android:color/darker_gray" />
 
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/btn_add_bonus"
@@ -107,15 +108,11 @@
                     app:backgroundTint="@color/secondaryColor"
                     tools:ignore="RtlSymmetry" />
 
-                <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/save_character"
+                <LinearLayout
+                    android:id="@+id/layout_character_bonus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/save"
-                    android:textColor="@color/primaryTextColor"
-                    app:backgroundTint="@color/secondaryColor" />
+                    android:orientation="vertical" />
 
             </LinearLayout>
 

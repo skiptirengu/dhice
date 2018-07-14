@@ -4,8 +4,6 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.os.Parcelable;
 
-import java.util.UUID;
-
 import io.requery.Entity;
 import io.requery.Generated;
 import io.requery.Key;
@@ -15,8 +13,6 @@ import io.requery.Transient;
 
 @Entity
 public abstract class CharacterBonus extends BaseObservable implements Persistable, Parcelable {
-    private String mCode;
-
     @Key
     @Generated
     public abstract int getId();
@@ -41,9 +37,6 @@ public abstract class CharacterBonus extends BaseObservable implements Persistab
 
     @Transient
     public final String uniqueId() {
-        if (mCode == null) {
-            mCode = UUID.randomUUID().toString();
-        }
-        return mCode;
+        return Integer.toHexString(super.hashCode());
     }
 }

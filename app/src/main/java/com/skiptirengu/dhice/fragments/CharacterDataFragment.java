@@ -9,6 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -51,8 +54,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     protected AppCompatEditText mEdtName;
     @BindView(R.id.character_race)
     protected AppCompatEditText mEdtRace;
-    @BindView(R.id.save_character)
-    protected Button mBtnSave;
     @BindView(R.id.btn_add_bonus)
     protected Button mBtnAddBonus;
 
@@ -73,6 +74,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         mViewModel.character().observe(this, this::processCharacterResponse);
         mViewModel.delete().observe(this, this::processRemoveBonusResponse);
         mViewModel.save().observe(this, this::proccessSaveResponse);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -83,15 +85,30 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         Bundle arguments = getArguments();
         mViewModel.setCharacterId(arguments != null ? arguments.getInt("id") : 0);
         mMainActivity.setTitle(mViewModel.getTitle());
-        mBtnSave.setOnClickListener(view -> save());
         mBtnAddBonus.setOnClickListener(view -> this.addBonus());
         mViewModel.fetchCharacter();
 
         return mBinding.getRoot();
     }
 
-    private void processRemoveBonusResponse(String index) {
-        final View childAt = (View) mLayoutBonus.findViewWithTag(index).getParent();
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_save, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_save_btn:
+                save();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void processRemoveBonusResponse(String tag) {
+        final View childAt = (View) mLayoutBonus.findViewWithTag(tag).getParent();
         Animations.delayed(Techniques.SlideOutRight, childAt, animator -> mLayoutBonus.removeView(childAt));
     }
 
@@ -104,16 +121,11 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         deleteBtn.setTag(data.getTag());
         binding.setBonus(data.getBonus());
         deleteBtn.setOnClickListener(view -> mViewModel.removeBonus((String) view.getTag()));
-        mLayoutBonus.addView(child);
+        mLayoutBonus.addView(child, 0);
 
         if (data.isNew()) {
-            Animations.delayed(Techniques.SlideInLeft, child, animator -> focusBonus(child));
+            Animations.delayed(Techniques.SlideInLeft, child, animator -> child.requestFocus());
         }
-    }
-
-    private void focusBonus(final View parent) {
-        mScrollView.fullScroll(View.FOCUS_DOWN);
-        parent.requestFocus();
     }
 
     private void processCharacterResponse(ViewModelResponse<Character> response) {
