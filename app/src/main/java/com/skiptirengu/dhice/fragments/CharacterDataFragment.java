@@ -6,8 +6,8 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatEditText;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,9 +51,9 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     @BindView(R.id.character_data_scrollview)
     protected ScrollView mScrollView;
     @BindView(R.id.character_name)
-    protected AppCompatEditText mEdtName;
+    protected TextInputEditText mEdtName;
     @BindView(R.id.character_race)
-    protected AppCompatEditText mEdtRace;
+    protected TextInputEditText mEdtRace;
     @BindView(R.id.btn_add_bonus)
     protected Button mBtnAddBonus;
 
