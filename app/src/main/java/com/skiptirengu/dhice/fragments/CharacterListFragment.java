@@ -3,6 +3,7 @@ package com.skiptirengu.dhice.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import com.skiptirengu.dhice.activities.MainActivity;
 
 import java.util.Objects;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -24,11 +27,16 @@ import io.reactivex.schedulers.Schedulers;
  * {@link Fragment}.
  */
 public class CharacterListFragment extends Fragment implements OnItemClickListener, View.OnClickListener {
+    @BindView(R.id.listview_characters)
+    protected ListView mListView;
+    @BindView(R.id.fab_new_character)
+    protected FloatingActionButton mActionButton;
+    @BindView(R.id.progress_bar)
+    protected View mProgress;
+    @BindView(R.id.layout_character_list)
+    protected View mMainLayout;
+    
     private CharacterListAdapter mAdapter;
-    private ListView mListView;
-    private FloatingActionButton mActionButton;
-    private View mProgress;
-    private View mMainLayout;
     private MainActivity mMainActivity;
 
     public CharacterListFragment() {
@@ -36,19 +44,19 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mMainActivity = Objects.requireNonNull((MainActivity) getActivity());
+        mMainActivity.setTitle(R.string.fragment_title_my_characters);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.character_list_fragment, container, false);
+        ButterKnife.bind(this, inflate);
 
-        mMainActivity = (MainActivity) getActivity();
-        mMainLayout = inflate.findViewById(R.id.layout_character_list);
-        mProgress = inflate.findViewById(R.id.progress_bar);
         setLoading(true);
-
         mAdapter = new CharacterListAdapter(requireContext());
-        mListView = inflate.findViewById(R.id.listview_characters);
-        mActionButton = inflate.findViewById(R.id.fab_new_character);
-
-        mMainActivity.setTitle(R.string.fragment_title_my_characters);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mActionButton.setOnClickListener(this);

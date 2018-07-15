@@ -12,6 +12,7 @@ import android.view.View;
 import com.skiptirengu.dhice.Application;
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.fragments.CharacterListFragment;
+import com.skiptirengu.dhice.fragments.DamageRollFragment;
 import com.skiptirengu.dhice.fragments.OnBackPressedListener;
 import com.skiptirengu.dhice.storage.Database;
 
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
                 setFragmentNonDuplicated(new CharacterListFragment());
                 return true;
             case R.id.navigation_roll:
+                setFragmentNonDuplicated(new DamageRollFragment());
                 return true;
         }
 
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setSupportActionBar(findViewById(R.id.app_toolbar));
 
         mContainer = findViewById(R.id.main_activity_container);
         mFragmentManager = getSupportFragmentManager();

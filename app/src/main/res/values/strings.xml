@@ -27,4 +27,5 @@
     <array name="array_item">
         <item>String</item>
     </array>
+    <string name="select_character">Select character</string>
 </resources>
