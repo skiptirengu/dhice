@@ -21,8 +21,8 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
+import com.skiptirengu.dhice.MainActivity;
 import com.skiptirengu.dhice.R;
-import com.skiptirengu.dhice.activities.MainActivity;
 import com.skiptirengu.dhice.databinding.CharacterBonusBinding;
 import com.skiptirengu.dhice.databinding.CharacterDataFragmentBinding;
 import com.skiptirengu.dhice.storage.Character;

@@ -13,8 +13,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.skiptirengu.dhice.MainActivity;
 import com.skiptirengu.dhice.R;
-import com.skiptirengu.dhice.activities.MainActivity;
 
 import java.util.Objects;
 
@@ -94,7 +94,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     private void setDataCharacterFragment(Bundle arguments) {
         CharacterDataFragment fragment = new CharacterDataFragment();
         fragment.setArguments(arguments);
-        mMainActivity.setFragment(fragment);
+        //mMainActivity.setFragment(fragment);
     }
 
     private void setLoading(boolean loading) {

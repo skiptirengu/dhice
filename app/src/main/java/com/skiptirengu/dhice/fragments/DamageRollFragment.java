@@ -12,8 +12,8 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.skiptirengu.dhice.MainActivity;
 import com.skiptirengu.dhice.R;
-import com.skiptirengu.dhice.activities.MainActivity;
 
 import java.util.Objects;
 
