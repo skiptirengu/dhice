@@ -12,13 +12,16 @@ import android.widget.TextView;
 import com.skiptirengu.dhice.R;
 import com.skiptirengu.dhice.storage.Character;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-class CharacterListAdapter extends ArrayAdapter<Character> {
+public class CharacterListAdapter extends ArrayAdapter<Character> {
 
-    CharacterListAdapter(@NonNull Context context) {
-        super(context, 0, new ArrayList<>());
+    private final List<Character> mList;
+
+    public CharacterListAdapter(@NonNull Context context, List<Character> list) {
+        super(context, 0, list);
+        mList = list;
     }
 
     @NonNull
@@ -34,5 +37,9 @@ class CharacterListAdapter extends ArrayAdapter<Character> {
 
     private String getDisplayText(@NonNull Character character) {
         return String.format("%s - %s", character.getName(), character.getRace());
+    }
+
+    public List<Character> getItems() {
+        return mList;
     }
 }

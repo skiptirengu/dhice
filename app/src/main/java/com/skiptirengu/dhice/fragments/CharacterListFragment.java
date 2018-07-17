@@ -16,6 +16,7 @@ import android.widget.ListView;
 import com.skiptirengu.dhice.MainActivity;
 import com.skiptirengu.dhice.R;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -31,9 +32,9 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
     protected ListView mListView;
     @BindView(R.id.fab_new_character)
     protected FloatingActionButton mActionButton;
-    @BindView(R.id.progress_bar)
+    @BindView(R.id.loadingView)
     protected View mProgress;
-    @BindView(R.id.layout_character_list)
+    @BindView(R.id.contentView)
     protected View mMainLayout;
     
     private CharacterListAdapter mAdapter;
@@ -56,7 +57,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
         ButterKnife.bind(this, inflate);
 
         setLoading(true);
-        mAdapter = new CharacterListAdapter(requireContext());
+        mAdapter = new CharacterListAdapter(requireContext(), new ArrayList<>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mActionButton.setOnClickListener(this);

@@ -16,8 +16,8 @@ import io.requery.sql.TableCreationMode;
 public class Database {
     private ReactiveEntityStore<Persistable> mDataStore;
 
-    public Database(Context ctx) {
-        DatabaseSource source = new DatabaseSource(ctx, Models.DEFAULT, 1);
+    public Database(Context application) {
+        DatabaseSource source = new DatabaseSource(application, Models.DEFAULT, 1);
 
         ConfigurationBuilder builder = new ConfigurationBuilder(source, Models.DEFAULT);
         builder.setQuoteColumnNames(true).setQuoteTableNames(true);

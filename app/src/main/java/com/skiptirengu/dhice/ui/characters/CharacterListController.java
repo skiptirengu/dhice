@@ -1,56 +1,51 @@
 package com.skiptirengu.dhice.ui.characters;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 
-import com.bluelinelabs.conductor.ControllerChangeHandler;
-import com.bluelinelabs.conductor.ControllerChangeType;
+import com.hannesdorfmann.mosby3.conductor.viewstate.lce.MvpLceViewStateController;
+import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
+import com.hannesdorfmann.mosby3.mvp.viewstate.lce.data.ParcelableListLceViewState;
 import com.skiptirengu.dhice.R;
+import com.skiptirengu.dhice.fragments.CharacterListAdapter;
 import com.skiptirengu.dhice.storage.Character;
-import com.skiptirengu.dhice.ui.base.BaseController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CharacterListController extends BaseController<CharacterListContract.View, CharacterListContract.Presenter>
+public class CharacterListController extends MvpLceViewStateController<FrameLayout, List<Character>, CharacterListContract.View, CharacterListContract.Presenter>
         implements CharacterListContract.View {
 
-    @BindView(R.id.layout_character_list)
+    @BindView(R.id.contentView)
     protected FrameLayout mLayout;
-    @BindView(R.id.progress_bar)
+    @BindView(R.id.loadingView)
     protected FrameLayout mProgress;
+    @BindView(R.id.listview_characters)
+    protected ListView mListView;
 
-    @Override
+    private CharacterListAdapter mAdapter;
+
     protected String getTitle() {
-        return getString(R.string.title_characters);
+        return getApplicationContext().getString(R.string.title_characters);
     }
 
     @NonNull
     @Override
     public CharacterListContract.Presenter createPresenter() {
-        return new CharacterListPresenter();
+        return new CharacterListPresenter(getApplicationContext());
     }
 
-    @Override
-    public void showLoading() {
+    public void showLoading(boolean pullToRefresh) {
         mProgress.setVisibility(View.VISIBLE);
         mLayout.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void hideLoading() {
-        mProgress.setVisibility(View.GONE);
-        mLayout.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onCharactersResult(List<Character> characterList) {
-        //
     }
 
     @NonNull
@@ -58,14 +53,39 @@ public class CharacterListController extends BaseController<CharacterListContrac
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.character_list_fragment, container, false);
         ButterKnife.bind(this, view);
+        initListView(view.getContext());
         return view;
     }
 
     @Override
-    protected void onChangeStarted(@NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
-        if (changeType.isEnter) {
-            presenter.loadCharacters();
-        }
-        super.onChangeStarted(changeHandler, changeType);
+    public List<Character> getData() {
+        return mAdapter.getItems();
+    }
+
+    @Override
+    public void setData(List<Character> data) {
+        mAdapter.clear();
+        mAdapter.addAll(data);
+    }
+
+    @NonNull
+    @Override
+    public LceViewState<List<Character>, CharacterListContract.View> createViewState() {
+        return new ParcelableListLceViewState<>();
+    }
+
+    @Override
+    protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
+        return "Ur mom gay";
+    }
+
+    @Override
+    public void loadData(boolean pullToRefresh) {
+        presenter.loadCharacters();
+    }
+
+    private void initListView(Context context) {
+        mAdapter = new CharacterListAdapter(context, new ArrayList<>());
+        mListView.setAdapter(mAdapter);
     }
 }

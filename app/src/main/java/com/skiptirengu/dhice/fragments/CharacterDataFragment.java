@@ -42,7 +42,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     private static final String USE_SPELL = "spells";
     private static final String USE_ATTACK = "attacks";
 
-    @BindView(R.id.progress_bar)
+    @BindView(R.id.loadingView)
     protected View mProgress;
     @BindView(R.id.layout_character_data)
     protected ViewGroup mMainLayout;

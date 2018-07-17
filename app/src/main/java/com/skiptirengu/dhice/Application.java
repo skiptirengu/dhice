@@ -3,12 +3,13 @@ package com.skiptirengu.dhice;
 import com.skiptirengu.dhice.storage.Database;
 
 public class Application extends android.app.Application {
-    private Database mDatabase;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        DaggerApplicationComponent.builder().create(this).inject(this);
+    }
 
     public synchronized Database getDatabase() {
-        if (mDatabase == null) {
-            mDatabase = new Database(this);
-        }
-        return mDatabase;
+        return null;
     }
 }
