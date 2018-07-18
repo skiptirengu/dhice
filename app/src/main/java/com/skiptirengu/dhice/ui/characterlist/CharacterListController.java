@@ -36,7 +36,7 @@ public class CharacterListController extends
     @BindView(R.id.recylerView)
     protected RecyclerView mRecyclerView;
 
-    private com.skiptirengu.dhice.ui.characterlist.CharacterListAdapter mRecyclerAdapter;
+    private CharacterListAdapter mRecyclerAdapter;
 
     protected String getTitle() {
         return Objects.requireNonNull(getApplicationContext()).getString(R.string.title_characters);
@@ -86,7 +86,7 @@ public class CharacterListController extends
     private void initListView(Context context) {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-        mRecyclerAdapter = new com.skiptirengu.dhice.ui.characterlist.CharacterListAdapter();
+        mRecyclerAdapter = new CharacterListAdapter();
         mRecyclerView.setAdapter(mRecyclerAdapter);
         disposeOnDetach(mRecyclerAdapter.click().subscribe(character -> onCharacterClicked(character)));
     }
