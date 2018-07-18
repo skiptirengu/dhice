@@ -12,7 +12,6 @@ import com.bluelinelabs.conductor.Router;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.skiptirengu.dhice.fragments.OnMenuItemPressedListener;
-import com.skiptirengu.dhice.storage.Database;
 import com.skiptirengu.dhice.ui.characterlist.CharacterListController;
 import com.skiptirengu.dhice.ui.roll.DamageRollController;
 
@@ -86,9 +85,5 @@ public class MainActivity extends AppCompatActivity {
         if (!mRouter.handleBack()) {
             super.onBackPressed();
         }
-    }
-
-    public Database getDatabase() {
-        return ((Application) getApplication()).getDatabase();
     }
 }

@@ -3,7 +3,7 @@ package com.skiptirengu.dhice.ui.characterlist;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.storage.CharacterEntity;
-import com.skiptirengu.dhice.storage.Database;
+import com.skiptirengu.dhice.storage.DatabaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class CharacterListPresenter extends MvpBasePresenter<CharacterListContra
     private CompositeDisposable mDisposable;
 
     CharacterListPresenter() {
-        mStorage = Database.getInstance();
+        mStorage = DatabaseStorage.getInstance();
         mDisposable = new CompositeDisposable();
     }
 

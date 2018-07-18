@@ -1,15 +1,15 @@
 package com.skiptirengu.dhice;
 
-import com.skiptirengu.dhice.storage.Database;
+import com.skiptirengu.dhice.storage.DatabaseStorage;
 
 public class Application extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Database.register(this);
+        DatabaseStorage.register(this);
     }
 
-    public synchronized Database getDatabase() {
+    public synchronized DatabaseStorage getDatabase() {
         return null;
     }
 }
