@@ -38,7 +38,7 @@ import butterknife.ButterKnife;
 /**
  * {@link Fragment}
  */
-public class CharacterDataFragment extends Fragment implements OnCheckedChangeListener, OnBackPressedListener {
+public class CharacterDataFragment extends Fragment implements OnCheckedChangeListener, OnMenuItemPressedListener {
     private static final String USE_SPELL = "spells";
     private static final String USE_ATTACK = "attacks";
 
@@ -204,7 +204,6 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         }
     }
 
-    @Override
     public void onBackPressed() {
         mMainActivity.getSupportFragmentManager().popBackStack();
     }

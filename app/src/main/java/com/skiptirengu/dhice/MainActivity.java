@@ -11,9 +11,9 @@ import com.bluelinelabs.conductor.Controller;
 import com.bluelinelabs.conductor.Router;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
-import com.skiptirengu.dhice.fragments.OnBackPressedListener;
+import com.skiptirengu.dhice.fragments.OnMenuItemPressedListener;
 import com.skiptirengu.dhice.storage.Database;
-import com.skiptirengu.dhice.ui.characters.CharacterListController;
+import com.skiptirengu.dhice.ui.characterlist.CharacterListController;
 import com.skiptirengu.dhice.ui.roll.DamageRollController;
 
 import butterknife.BindView;
@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
         Controller topController = getTopController();
         if (topController != null
-                && (topController instanceof OnBackPressedListener)
-                && ((OnBackPressedListener) topController).onMenuItemPressed(itemId)) {
+                && (topController instanceof OnMenuItemPressedListener)
+                && ((OnMenuItemPressedListener) topController).onMenuItemPressed(itemId)) {
             return true;
         }
 

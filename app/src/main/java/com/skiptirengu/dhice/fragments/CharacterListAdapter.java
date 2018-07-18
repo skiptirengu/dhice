@@ -28,7 +28,7 @@ public class CharacterListAdapter extends ArrayAdapter<Character> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.character_list_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.characterlist_item, parent, false);
         }
         TextView textView = convertView.findViewById(R.id.txv_character_name);
         textView.setText(getDisplayText(Objects.requireNonNull(getItem(position))));

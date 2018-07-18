@@ -1,4 +1,4 @@
-package com.skiptirengu.dhice.ui.characters;
+package com.skiptirengu.dhice.ui.characterlist;
 
 import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.lce.MvpLceView;

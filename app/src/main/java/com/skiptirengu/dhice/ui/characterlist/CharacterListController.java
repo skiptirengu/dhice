@@ -1,42 +1,45 @@
-package com.skiptirengu.dhice.ui.characters;
+package com.skiptirengu.dhice.ui.characterlist;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.hannesdorfmann.mosby3.conductor.viewstate.lce.MvpLceViewStateController;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.data.ParcelableListLceViewState;
 import com.skiptirengu.dhice.R;
-import com.skiptirengu.dhice.fragments.CharacterListAdapter;
+import com.skiptirengu.dhice.fragments.OnMenuItemPressedListener;
 import com.skiptirengu.dhice.storage.Character;
+import com.skiptirengu.dhice.ui.base.RxMvpLceViewStateController;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class CharacterListController extends MvpLceViewStateController<FrameLayout, List<Character>, CharacterListContract.View, CharacterListContract.Presenter>
-        implements CharacterListContract.View {
+public class CharacterListController extends
+        RxMvpLceViewStateController<FrameLayout, List<Character>, CharacterListContract.View, CharacterListContract.Presenter>
+        implements CharacterListContract.View, OnMenuItemPressedListener {
 
     @BindView(R.id.contentView)
     protected FrameLayout mLayout;
     @BindView(R.id.loadingView)
     protected FrameLayout mProgress;
-    @BindView(R.id.listview_characters)
-    protected ListView mListView;
+    @BindView(R.id.recylerView)
+    protected RecyclerView mRecyclerView;
 
-    private CharacterListAdapter mAdapter;
+    private com.skiptirengu.dhice.ui.characterlist.CharacterListAdapter mRecyclerAdapter;
 
     protected String getTitle() {
-        return getApplicationContext().getString(R.string.title_characters);
+        return Objects.requireNonNull(getApplicationContext()).getString(R.string.title_characters);
     }
 
     @NonNull
@@ -45,15 +48,10 @@ public class CharacterListController extends MvpLceViewStateController<FrameLayo
         return new CharacterListPresenter();
     }
 
-    public void showLoading(boolean pullToRefresh) {
-        mProgress.setVisibility(View.VISIBLE);
-        mLayout.setVisibility(View.GONE);
-    }
-
     @NonNull
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        View view = inflater.inflate(R.layout.character_list_fragment, container, false);
+        View view = inflater.inflate(R.layout.characterlist, container, false);
         ButterKnife.bind(this, view);
         initListView(view.getContext());
         return view;
@@ -61,13 +59,12 @@ public class CharacterListController extends MvpLceViewStateController<FrameLayo
 
     @Override
     public List<Character> getData() {
-        return mAdapter.getItems();
+        return mRecyclerAdapter.getItems();
     }
 
     @Override
     public void setData(List<Character> data) {
-        mAdapter.clear();
-        mAdapter.addAll(data);
+        mRecyclerAdapter.setItems(data);
     }
 
     @NonNull
@@ -87,19 +84,26 @@ public class CharacterListController extends MvpLceViewStateController<FrameLayo
     }
 
     private void initListView(Context context) {
-        mAdapter = new CharacterListAdapter(context, new ArrayList<>());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener((parent, view, position, id) -> onCharacterClicked(mAdapter.getItem(position)));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+        mRecyclerAdapter = new com.skiptirengu.dhice.ui.characterlist.CharacterListAdapter();
+        mRecyclerView.setAdapter(mRecyclerAdapter);
+        disposeOnDetach(mRecyclerAdapter.click().subscribe(character -> onCharacterClicked(character)));
     }
 
     @Override
     public void onCharacterClicked(Character character) {
-        Toast.makeText(getView().getContext(), "Clicked character", Toast.LENGTH_SHORT).show();
+        Toast.makeText(Objects.requireNonNull(getView()).getContext(), "Clicked character", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     @OnClick(R.id.fab_new_character)
     public void onNewCharacterClicked(View view) {
         Toast.makeText(view.getContext(), "Clicked fab", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onMenuItemPressed(int menuItemId) {
+        return menuItemId == R.id.navigation_characters;
     }
 }

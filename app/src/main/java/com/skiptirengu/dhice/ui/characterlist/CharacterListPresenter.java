@@ -1,4 +1,4 @@
-package com.skiptirengu.dhice.ui.characters;
+package com.skiptirengu.dhice.ui.characterlist;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.skiptirengu.dhice.storage.Character;
@@ -16,8 +16,9 @@ import io.requery.Persistable;
 import io.requery.reactivex.ReactiveEntityStore;
 
 public class CharacterListPresenter extends MvpBasePresenter<CharacterListContract.View> implements CharacterListContract.Presenter {
-    protected ReactiveEntityStore<Persistable> mStorage;
-    protected CompositeDisposable mDisposable;
+
+    private ReactiveEntityStore<Persistable> mStorage;
+    private CompositeDisposable mDisposable;
 
     CharacterListPresenter() {
         mStorage = Database.getInstance();

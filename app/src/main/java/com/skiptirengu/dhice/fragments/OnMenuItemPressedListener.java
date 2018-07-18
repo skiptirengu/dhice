@@ -1,8 +1,6 @@
 package com.skiptirengu.dhice.fragments;
 
-public interface OnBackPressedListener {
-
-    void onBackPressed();
+public interface OnMenuItemPressedListener {
 
     boolean onMenuItemPressed(int menuItemId);
 }
