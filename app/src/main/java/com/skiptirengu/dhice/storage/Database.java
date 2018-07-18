@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.skiptirengu.dhice.BuildConfig;
 
-import io.reactivex.Observable;
 import io.requery.Persistable;
 import io.requery.android.sqlite.DatabaseSource;
 import io.requery.reactivex.ReactiveEntityStore;
@@ -14,10 +13,10 @@ import io.requery.sql.EntityDataStore;
 import io.requery.sql.TableCreationMode;
 
 public class Database {
-    private ReactiveEntityStore<Persistable> mDataStore;
+    private static ReactiveEntityStore<Persistable> dataStore;
 
-    public Database(Context application) {
-        DatabaseSource source = new DatabaseSource(application, Models.DEFAULT, 1);
+    public synchronized static void register(Context context) {
+        DatabaseSource source = new DatabaseSource(context, Models.DEFAULT, 1);
 
         ConfigurationBuilder builder = new ConfigurationBuilder(source, Models.DEFAULT);
         builder.setQuoteColumnNames(true).setQuoteTableNames(true);
@@ -28,20 +27,16 @@ public class Database {
             source.setLoggingEnabled(true);
         }
 
-        mDataStore = ReactiveSupport.toReactiveStore(
+        dataStore = ReactiveSupport.toReactiveStore(
                 new EntityDataStore<Persistable>(builder.build())
         );
     }
 
-    public ReactiveEntityStore<Persistable> getDataStore() {
-        return mDataStore;
+    public static ReactiveEntityStore<Persistable> getInstance() {
+        return dataStore;
     }
 
-    public Observable<Character> findCharacters() {
-        return mDataStore
-                .select(Character.class)
-                .orderBy(CharacterEntity.NAME.lower())
-                .get()
-                .observable();
+    public ReactiveEntityStore<Persistable> getDataStore() {
+        return dataStore;
     }
 }

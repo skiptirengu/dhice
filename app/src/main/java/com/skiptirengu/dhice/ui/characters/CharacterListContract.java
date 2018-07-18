@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface CharacterListContract {
     interface View extends MvpLceView<List<Character>> {
+        void onCharacterClicked(Character character);
+
+        void onNewCharacterClicked(android.view.View view);
     }
 
     interface Presenter extends MvpPresenter<View> {

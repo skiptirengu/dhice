@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.conductor.viewstate.lce.MvpLceViewStateController;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class CharacterListController extends MvpLceViewStateController<FrameLayout, List<Character>, CharacterListContract.View, CharacterListContract.Presenter>
         implements CharacterListContract.View {
@@ -40,7 +42,7 @@ public class CharacterListController extends MvpLceViewStateController<FrameLayo
     @NonNull
     @Override
     public CharacterListContract.Presenter createPresenter() {
-        return new CharacterListPresenter(getApplicationContext());
+        return new CharacterListPresenter();
     }
 
     public void showLoading(boolean pullToRefresh) {
@@ -87,5 +89,17 @@ public class CharacterListController extends MvpLceViewStateController<FrameLayo
     private void initListView(Context context) {
         mAdapter = new CharacterListAdapter(context, new ArrayList<>());
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener((parent, view, position, id) -> onCharacterClicked(mAdapter.getItem(position)));
+    }
+
+    @Override
+    public void onCharacterClicked(Character character) {
+        Toast.makeText(getView().getContext(), "Clicked character", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    @OnClick(R.id.fab_new_character)
+    public void onNewCharacterClicked(View view) {
+        Toast.makeText(view.getContext(), "Clicked fab", Toast.LENGTH_SHORT).show();
     }
 }

@@ -21,8 +21,6 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * {@link Fragment}.
@@ -68,7 +66,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
 
     @SuppressLint("CheckResult")
     private void refreshAdapter() {
-        mMainActivity
+        /*mMainActivity
                 .getDatabase()
                 .findCharacters()
                 .subscribeOn(Schedulers.io())
@@ -77,7 +75,7 @@ public class CharacterListFragment extends Fragment implements OnItemClickListen
                         item -> mAdapter.add(item),
                         Throwable::printStackTrace,
                         () -> setLoading(false)
-                );
+                );*/
     }
 
     @Override

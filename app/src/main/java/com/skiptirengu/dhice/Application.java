@@ -6,7 +6,7 @@ public class Application extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        DaggerApplicationComponent.builder().create(this).inject(this);
+        Database.register(this);
     }
 
     public synchronized Database getDatabase() {

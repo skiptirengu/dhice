@@ -1,7 +1,5 @@
 package com.skiptirengu.dhice.ui.characters;
 
-import android.content.Context;
-
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.storage.CharacterEntity;
@@ -14,13 +12,15 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.requery.Persistable;
+import io.requery.reactivex.ReactiveEntityStore;
 
 public class CharacterListPresenter extends MvpBasePresenter<CharacterListContract.View> implements CharacterListContract.Presenter {
-    protected Database mDatabase;
+    protected ReactiveEntityStore<Persistable> mStorage;
     protected CompositeDisposable mDisposable;
 
-    CharacterListPresenter(Context applicationContext) {
-        mDatabase = new Database(applicationContext);
+    CharacterListPresenter() {
+        mStorage = Database.getInstance();
         mDisposable = new CompositeDisposable();
     }
 
@@ -33,8 +33,7 @@ public class CharacterListPresenter extends MvpBasePresenter<CharacterListContra
     @Override
     public void loadCharacters() {
         mDisposable.add(
-                mDatabase
-                        .getDataStore()
+                mStorage
                         .select(Character.class)
                         .orderBy(CharacterEntity.NAME.lower())
                         .get()
