@@ -23,9 +23,11 @@
     <string name="bonus">Bonus</string>
     <string name="delete">Delete</string>
     <string name="load_error">Unable to load character</string>
+    <string name="error_occurred">An error has occurred</string>
     <string name="character_save_error">Unable to save character</string>
     <array name="array_item">
         <item>String</item>
     </array>
     <string name="select_character">Select character</string>
+    <string name="nothing_to_see">Nothing to see here</string>
 </resources>

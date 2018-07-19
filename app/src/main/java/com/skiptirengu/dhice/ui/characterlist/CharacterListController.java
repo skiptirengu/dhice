@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.data.ParcelableListLceViewState;
 import com.skiptirengu.dhice.R;
+import com.skiptirengu.dhice.exception.EmptyResultException;
 import com.skiptirengu.dhice.fragments.OnMenuItemPressedListener;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.ui.base.RxMvpLceViewStateController;
@@ -29,10 +30,6 @@ public class CharacterListController extends
         RxMvpLceViewStateController<FrameLayout, List<Character>, CharacterListContract.View, CharacterListContract.Presenter>
         implements CharacterListContract.View, OnMenuItemPressedListener {
 
-    @BindView(R.id.contentView)
-    protected FrameLayout mLayout;
-    @BindView(R.id.loadingView)
-    protected FrameLayout mProgress;
     @BindView(R.id.recylerView)
     protected RecyclerView mRecyclerView;
 
@@ -58,6 +55,12 @@ public class CharacterListController extends
     }
 
     @Override
+    protected void onAttach(@NonNull View view) {
+        super.onAttach(view);
+        errorView.setClickable(false);
+    }
+
+    @Override
     public List<Character> getData() {
         return mRecyclerAdapter.getItems();
     }
@@ -75,7 +78,12 @@ public class CharacterListController extends
 
     @Override
     protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
-        return "Ur mom gay";
+        Context context = Objects.requireNonNull(getApplicationContext());
+        if (e instanceof EmptyResultException) {
+            return context.getString(R.string.nothing_to_see);
+        } else {
+            return context.getString(R.string.error_occurred);
+        }
     }
 
     @Override
@@ -84,9 +92,9 @@ public class CharacterListController extends
     }
 
     private void initListView(Context context) {
+        mRecyclerAdapter = new CharacterListAdapter();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-        mRecyclerAdapter = new CharacterListAdapter();
         mRecyclerView.setAdapter(mRecyclerAdapter);
         disposeOnDetach(mRecyclerAdapter.click().subscribe(character -> onCharacterClicked(character)));
     }
@@ -105,5 +113,10 @@ public class CharacterListController extends
     @Override
     public boolean onMenuItemPressed(int menuItemId) {
         return menuItemId == R.id.navigation_characters;
+    }
+
+    @Override
+    protected int getEmptyDrawable() {
+        return R.drawable.ic_group_black_128dp;
     }
 }

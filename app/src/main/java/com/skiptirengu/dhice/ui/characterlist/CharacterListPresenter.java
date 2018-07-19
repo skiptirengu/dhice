@@ -1,11 +1,11 @@
 package com.skiptirengu.dhice.ui.characterlist;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
+import com.skiptirengu.dhice.exception.EmptyResultException;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.storage.CharacterEntity;
 import com.skiptirengu.dhice.storage.DatabaseStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -45,16 +45,24 @@ public class CharacterListPresenter extends MvpBasePresenter<CharacterListContra
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe(disposable -> onCharacterStart())
                         .doOnSuccess(characters -> onCharactersResult(characters))
-                        .doOnError(throwable -> onCharactersResult(new ArrayList<>()))
+                        .doOnError(throwable -> onCharacterError(throwable))
                         .subscribe()
         );
 
     }
 
+    private void onCharacterError(Throwable throwable) {
+        ifViewAttached(view -> view.showError(throwable, false));
+    }
+
     private void onCharactersResult(List<Character> list) {
         ifViewAttached(view -> {
-            view.setData(list);
-            view.showContent();
+            if (!list.isEmpty()) {
+                view.setData(list);
+                view.showContent();
+            } else {
+                view.showError(new EmptyResultException(), false);
+            }
         });
     }
 
