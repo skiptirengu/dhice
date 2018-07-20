@@ -16,8 +16,10 @@
 
         <include layout="@layout/progress_bar" />
 
+        <include layout="@layout/error_view" />
+
         <ScrollView
-            android:id="@+id/character_data_scrollview"
+            android:id="@+id/contentView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -38,7 +40,7 @@
                         android:id="@+id/character_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/character_name"
+                        android:hint="@string/label_character_name"
                         android:inputType="textCapSentences"
                         android:text="@={character.name}" />
                 </android.support.design.widget.TextInputLayout>
@@ -53,7 +55,7 @@
                         android:id="@+id/character_race"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/character_race"
+                        android:hint="@string/label_character_race"
                         android:inputType="textCapSentences"
                         android:text="@={character.race}" />
                 </android.support.design.widget.TextInputLayout>
@@ -69,7 +71,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/i_mostly_use"
+                        android:text="@string/label_i_mostly_use"
                         android:textSize="@dimen/input_label" />
 
                     <RadioButton
@@ -77,13 +79,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="@string/magic_spells" />
+                        android:text="@string/label_magic_spells" />
 
                     <RadioButton
                         android:id="@+id/character_use_attacks"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/weapon_attacks" />
+                        android:text="@string/label_weapon_attacks" />
                 </RadioGroup>
 
                 <View

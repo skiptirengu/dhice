@@ -4,6 +4,6 @@
     <item
         android:id="@+id/menu_select_character_spn"
         android:icon="@drawable/ic_clear_white_24dp"
-        android:title="@string/select_character"
+        android:title="@string/label_select_character"
         app:showAsAction="always" />
 </menu>

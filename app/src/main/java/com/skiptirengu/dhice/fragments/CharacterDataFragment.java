@@ -23,8 +23,8 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.skiptirengu.dhice.MainActivity;
 import com.skiptirengu.dhice.R;
+import com.skiptirengu.dhice.databinding.CharacterBinding;
 import com.skiptirengu.dhice.databinding.CharacterBonusBinding;
-import com.skiptirengu.dhice.databinding.CharacterDataFragmentBinding;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.util.Animations;
 import com.skiptirengu.dhice.viewmodel.CharacterDataViewModel;
@@ -48,7 +48,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     protected ViewGroup mMainLayout;
     @BindView(R.id.layout_character_bonus)
     protected ViewGroup mLayoutBonus;
-    @BindView(R.id.character_data_scrollview)
+    @BindView(R.id.contentView)
     protected ScrollView mScrollView;
     @BindView(R.id.character_name)
     protected TextInputEditText mEdtName;
@@ -58,7 +58,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
     protected Button mBtnAddBonus;
 
     private MainActivity mMainActivity;
-    private CharacterDataFragmentBinding mBinding;
+    private CharacterBinding mBinding;
     private CharacterDataViewModel mViewModel;
 
     public CharacterDataFragment() {
@@ -79,7 +79,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.character_data_fragment, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.character, container, false);
         ButterKnife.bind(this, mBinding.getRoot());
 
         Bundle arguments = getArguments();
@@ -138,7 +138,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
                 setLoading(false);
                 break;
             case ERRORED:
-                Toast.makeText(mMainActivity, R.string.load_error, Toast.LENGTH_LONG).show();
+                Toast.makeText(mMainActivity, R.string.error_load_character, Toast.LENGTH_LONG).show();
                 onBackPressed();
         }
     }
@@ -153,7 +153,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
                 Toast.makeText(mMainActivity, response.getData(), Toast.LENGTH_SHORT).show();
                 break;
             case ERRORED:
-                Toast.makeText(mMainActivity, R.string.character_save_error, Toast.LENGTH_LONG).show();
+                Toast.makeText(mMainActivity, R.string.error_save_character, Toast.LENGTH_LONG).show();
                 setLoading(false);
                 break;
         }
@@ -168,11 +168,11 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         View error = null;
 
         if (mEdtRace.getText().toString().isEmpty()) {
-            mEdtRace.setError(getString(R.string.race_required));
+            mEdtRace.setError(getString(R.string.validation_race_required));
             error = mEdtRace;
         }
         if (mEdtName.getText().toString().isEmpty()) {
-            mEdtName.setError(getString(R.string.name_required));
+            mEdtName.setError(getString(R.string.validation_name_required));
             error = mEdtName;
         }
 

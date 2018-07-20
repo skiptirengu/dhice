@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         if (mRouter.getBackstackSize() == 0) {
             return null;
         } else {
-            return mRouter.getBackstack().get(0).controller();
+            return mRouter.getBackstack().get(mRouter.getBackstackSize() - 1).controller();
         }
     }
 

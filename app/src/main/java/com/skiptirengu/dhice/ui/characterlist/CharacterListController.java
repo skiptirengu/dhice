@@ -1,6 +1,7 @@
 package com.skiptirengu.dhice.ui.characterlist;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,8 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
+import com.bluelinelabs.conductor.RouterTransaction;
+import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.data.ParcelableListLceViewState;
 import com.skiptirengu.dhice.R;
@@ -18,6 +20,7 @@ import com.skiptirengu.dhice.exception.EmptyResultException;
 import com.skiptirengu.dhice.fragments.OnMenuItemPressedListener;
 import com.skiptirengu.dhice.storage.Character;
 import com.skiptirengu.dhice.ui.base.RxMvpLceViewStateController;
+import com.skiptirengu.dhice.ui.character.CharacterController;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,8 +35,11 @@ public class CharacterListController extends
 
     @BindView(R.id.recylerView)
     protected RecyclerView mRecyclerView;
-
     private CharacterListAdapter mRecyclerAdapter;
+
+    {
+        setHasEmptyState(true);
+    }
 
     protected String getTitle() {
         return Objects.requireNonNull(getApplicationContext()).getString(R.string.title_characters);
@@ -70,6 +76,11 @@ public class CharacterListController extends
         mRecyclerAdapter.setItems(data);
     }
 
+    @Override
+    protected void onRestoreViewState(@NonNull View view, @NonNull Bundle savedViewState) {
+        super.onRestoreViewState(view, savedViewState);
+    }
+
     @NonNull
     @Override
     public LceViewState<List<Character>, CharacterListContract.View> createViewState() {
@@ -80,7 +91,7 @@ public class CharacterListController extends
     protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
         Context context = Objects.requireNonNull(getApplicationContext());
         if (e instanceof EmptyResultException) {
-            return context.getString(R.string.nothing_to_see);
+            return context.getString(R.string.error_nothing_to_see);
         } else {
             return context.getString(R.string.error_occurred);
         }
@@ -101,13 +112,13 @@ public class CharacterListController extends
 
     @Override
     public void onCharacterClicked(Character character) {
-        Toast.makeText(Objects.requireNonNull(getView()).getContext(), "Clicked character", Toast.LENGTH_SHORT).show();
+        goToCharacter(character.getId());
     }
 
     @Override
     @OnClick(R.id.fab_new_character)
     public void onNewCharacterClicked(View view) {
-        Toast.makeText(view.getContext(), "Clicked fab", Toast.LENGTH_SHORT).show();
+        goToCharacter(0);
     }
 
     @Override
@@ -118,5 +129,15 @@ public class CharacterListController extends
     @Override
     protected int getEmptyDrawable() {
         return R.drawable.ic_group_black_128dp;
+    }
+
+    private void goToCharacter(int id) {
+        CharacterController controller = new CharacterController();
+        controller.getArgs().putInt(CharacterController.INTENT_CHARACTER_ID, id);
+        getRouter().pushController(
+                RouterTransaction.with(controller)
+                        .pushChangeHandler(new HorizontalChangeHandler())
+                        .popChangeHandler(new HorizontalChangeHandler())
+        );
     }
 }

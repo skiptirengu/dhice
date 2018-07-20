@@ -50,7 +50,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
     }
 
     public String getTitle() {
-        return getApplication().getString(isUpdate() ? R.string.update_character : R.string.create_character);
+        return getApplication().getString(isUpdate() ? R.string.title_update_character : R.string.title_create_character);
     }
 
     public MutableLiveData<ViewModelResponse<Character>> character() {
@@ -144,7 +144,7 @@ public class CharacterDataViewModel extends AndroidViewModel {
     }
 
     private String getSaveString() {
-        return getApp().getString(R.string.character_saved);
+        return getApp().getString(R.string.message_character_saved);
     }
 
     public class CharacterBonusResponse {

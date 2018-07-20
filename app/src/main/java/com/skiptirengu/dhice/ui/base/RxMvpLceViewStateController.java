@@ -28,6 +28,7 @@ public abstract class RxMvpLceViewStateController<CV extends View, M, V extends 
         extends MvpPresenter<V>> extends MvpLceViewStateController<CV, M, V, P> {
 
     private final CompositeDisposable mOnDetachCompositeDisposable = new CompositeDisposable();
+    private boolean mHasEmptyState;
 
     @Override
     protected void onDetach(@NonNull View view) {
@@ -37,6 +38,10 @@ public abstract class RxMvpLceViewStateController<CV extends View, M, V extends 
 
     protected void disposeOnDetach(Disposable disposable) {
         mOnDetachCompositeDisposable.add(disposable);
+    }
+
+    protected void setHasEmptyState(boolean hasEmptyState) {
+        mHasEmptyState = hasEmptyState;
     }
 
     private void setTitle() {
@@ -67,11 +72,13 @@ public abstract class RxMvpLceViewStateController<CV extends View, M, V extends 
     protected abstract String getTitle();
 
     @DrawableRes
-    protected abstract int getEmptyDrawable();
+    protected int getEmptyDrawable() {
+        return 0;
+    }
 
     @Override
     public void showError(Throwable e, boolean pullToRefresh) {
-        if (e instanceof EmptyResultException) {
+        if (mHasEmptyState && e instanceof EmptyResultException) {
             Context context = Objects.requireNonNull(getApplicationContext());
             Drawable drawable = Objects.requireNonNull(ContextCompat.getDrawable(context, getEmptyDrawable()));
             drawable.setColorFilter(ContextCompat.getColor(context, R.color.hintColor), PorterDuff.Mode.MULTIPLY);
