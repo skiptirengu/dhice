@@ -47,7 +47,7 @@ public abstract class RxMvpLceViewStateController<CV extends View, M, V extends 
     private void setTitle() {
         Controller parentController = getParentController();
         while (parentController != null) {
-            if (parentController instanceof BaseController && ((BaseController) parentController).getTitle() != null) {
+            if (parentController instanceof RxMvpLceViewStateController && ((RxMvpLceViewStateController) parentController).getTitle() != null) {
                 return;
             }
             parentController = parentController.getParentController();
