@@ -6,8 +6,13 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.bluelinelabs.conductor.Controller;
+import com.bluelinelabs.conductor.ControllerChangeHandler;
+import com.bluelinelabs.conductor.ControllerChangeType;
 import com.hannesdorfmann.mosby3.conductor.viewstate.lce.MvpLceViewStateController;
 import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.lce.MvpLceView;
@@ -33,6 +38,33 @@ public abstract class RxMvpLceViewStateController<CV extends View, M, V extends 
     protected void disposeOnDetach(Disposable disposable) {
         mOnDetachCompositeDisposable.add(disposable);
     }
+
+    private void setTitle() {
+        Controller parentController = getParentController();
+        while (parentController != null) {
+            if (parentController instanceof BaseController && ((BaseController) parentController).getTitle() != null) {
+                return;
+            }
+            parentController = parentController.getParentController();
+        }
+
+        String title = getTitle();
+        ActionBar actionBar = ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar();
+
+        if (title != null && actionBar != null) {
+            actionBar.setTitle(title);
+        }
+    }
+
+    @Override
+    protected void onChangeStarted(@NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
+        if (changeType.isEnter) {
+            setTitle();
+        }
+        super.onChangeStarted(changeHandler, changeType);
+    }
+
+    protected abstract String getTitle();
 
     @DrawableRes
     protected abstract int getEmptyDrawable();
