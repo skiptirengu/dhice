@@ -7,11 +7,12 @@ import com.skiptirengu.dhice.storage.Character;
 
 interface CharacterContract {
     interface View extends MvpLceView<Character> {
+        void onAddBonus(android.view.View view);
 
+        void onRemoveBonus(int position);
     }
 
     interface Presenter extends MvpPresenter<View> {
-
         void loadCharacter(int id);
     }
 }

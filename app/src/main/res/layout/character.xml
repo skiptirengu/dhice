@@ -18,7 +18,7 @@
 
         <include layout="@layout/error_view" />
 
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -107,6 +107,11 @@
                     app:backgroundTint="@color/secondaryColor"
                     tools:ignore="RtlSymmetry" />
 
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recylerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
                 <LinearLayout
                     android:id="@+id/layout_character_bonus"
                     android:layout_width="match_parent"
@@ -115,7 +120,7 @@
 
             </LinearLayout>
 
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView>
 
     </FrameLayout>
 

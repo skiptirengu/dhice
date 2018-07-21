@@ -44,6 +44,7 @@ dependencies {
     implementation 'com.bluelinelabs:conductor:2.1.4'
     implementation 'com.hannesdorfmann.mosby3:viewstate-conductor:3.1.0'
     implementation 'com.dmitrymalkovich.android:material-design-dimens:1.4'
+    implementation 'jp.wasabeef:recyclerview-animators:2.3.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     annotationProcessor 'io.requery:requery-processor:1.5.1'
     testImplementation 'junit:junit:4.12'
