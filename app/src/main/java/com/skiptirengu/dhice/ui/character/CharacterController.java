@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -39,6 +41,7 @@ public class CharacterController extends
 
     {
         setHasEmptyState(false);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -61,6 +64,11 @@ public class CharacterController extends
     @Override
     protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
         return null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_save, menu);
     }
 
     @NonNull
