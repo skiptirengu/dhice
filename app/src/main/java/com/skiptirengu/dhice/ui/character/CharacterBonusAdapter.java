@@ -50,6 +50,12 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
         }
     }
 
+    public void setList(List<CharacterBonus> list) {
+        synchronized (mListLock) {
+            mList = list;
+        }
+    }
+
     public Observable<Integer> delete() {
         return mOnClickSubject;
     }

@@ -10,9 +10,15 @@ interface CharacterContract {
         void onAddBonus(android.view.View view);
 
         void onRemoveBonus(int position);
+
+        boolean onSaveClick();
+
+        void onCharacterSaved();
     }
 
     interface Presenter extends MvpPresenter<View> {
         void loadCharacter(int id);
+
+        void saveCharacter(Character mCharacter);
     }
 }

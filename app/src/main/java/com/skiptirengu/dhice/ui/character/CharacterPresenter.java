@@ -23,16 +23,16 @@ public class CharacterPresenter extends RxMvpBasePresenter<CharacterContract.Vie
 
     @Override
     public void loadCharacter(int id) {
-        Maybe<Character> maycharacterMaybe;
+        Maybe<Character> characterMaybe;
 
         if (id > 0) {
-            maycharacterMaybe = mStorage.findByKey(Character.class, id);
+            characterMaybe = mStorage.findByKey(Character.class, id);
         } else {
-            maycharacterMaybe = Maybe.just(new CharacterEntity());
+            characterMaybe = Maybe.just(new CharacterEntity());
         }
 
         disposeOnDestroy(
-                maycharacterMaybe
+                characterMaybe
                         .subscribeOn(Schedulers.io())
                         .delay(250, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
@@ -43,12 +43,34 @@ public class CharacterPresenter extends RxMvpBasePresenter<CharacterContract.Vie
         );
     }
 
+    @Override
+    public void saveCharacter(Character entity) {
+        disposeOnDestroy(
+                mStorage
+                        .upsert(entity)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(disposable -> onCharacterStart())
+                        .doOnSuccess(character -> onCharacterSaved())
+                        .doOnError(throwable -> onCharacterError(throwable, true))
+                        .subscribe()
+        );
+    }
+
+    private void onCharacterSaved() {
+        ifViewAttached(view -> view.onCharacterSaved());
+    }
+
     private void onCharacterStart() {
         ifViewAttached(view -> view.showLoading(false));
     }
 
     private void onCharacterError(Throwable throwable) {
-        ifViewAttached(view -> view.showError(throwable, false));
+        onCharacterError(throwable, false);
+    }
+
+    private void onCharacterError(Throwable throwable, boolean pullToRefresh) {
+        ifViewAttached(view -> view.showError(throwable, pullToRefresh));
     }
 
     private void onCharacterResult(Character character) {
