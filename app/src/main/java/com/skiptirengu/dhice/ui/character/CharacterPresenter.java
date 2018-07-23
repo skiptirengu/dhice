@@ -36,7 +36,7 @@ public class CharacterPresenter extends RxMvpBasePresenter<CharacterContract.Vie
                         .subscribeOn(Schedulers.io())
                         .delay(250, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe(disposable -> onCharacterStart())
+                        .doOnSubscribe(disposable -> onCharacterLoad())
                         .doOnSuccess(character -> onCharacterResult(character))
                         .doOnError(throwable -> onCharacterError(throwable))
                         .subscribe()
@@ -50,9 +50,9 @@ public class CharacterPresenter extends RxMvpBasePresenter<CharacterContract.Vie
                         .upsert(entity)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe(disposable -> onCharacterStart())
+                        .doOnSubscribe(disposable -> onCharacterLoad())
                         .doOnSuccess(character -> onCharacterSaved())
-                        .doOnError(throwable -> onCharacterError(throwable, true))
+                        .doOnError(throwable -> onCharacterSaveError(throwable))
                         .subscribe()
         );
     }
@@ -61,16 +61,19 @@ public class CharacterPresenter extends RxMvpBasePresenter<CharacterContract.Vie
         ifViewAttached(view -> view.onCharacterSaved());
     }
 
-    private void onCharacterStart() {
+    private void onCharacterLoad() {
         ifViewAttached(view -> view.showLoading(false));
     }
 
-    private void onCharacterError(Throwable throwable) {
-        onCharacterError(throwable, false);
+    private void onCharacterSaveError(Throwable throwable) {
+        ifViewAttached(view -> {
+            view.showContent();
+            view.showError(throwable, true);
+        });
     }
 
-    private void onCharacterError(Throwable throwable, boolean pullToRefresh) {
-        ifViewAttached(view -> view.showError(throwable, pullToRefresh));
+    private void onCharacterError(Throwable throwable) {
+        ifViewAttached(view -> view.showError(throwable, false));
     }
 
     private void onCharacterResult(Character character) {
