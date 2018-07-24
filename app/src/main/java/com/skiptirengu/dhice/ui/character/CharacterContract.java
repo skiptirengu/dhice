@@ -11,7 +11,7 @@ interface CharacterContract {
 
         void onRemoveBonus(int position);
 
-        boolean onSaveClick();
+        void onSaveClick();
 
         void onCharacterSaved();
     }

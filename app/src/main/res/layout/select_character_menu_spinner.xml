@@ -9,5 +9,5 @@
         android:layout_width="@dimen/menu_spinner_size"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:entries="@array/array_item" />
+        android:entries="@array/bonus_types" />
 </FrameLayout>

@@ -2,6 +2,7 @@ package com.skiptirengu.dhice.ui.character;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -86,15 +87,21 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
 
     class CharacterBonusViewHolder extends RecyclerView.ViewHolder {
         final CharacterBonusBinding mBinding;
+        final TextInputLayout mBonusNameLayout;
 
         private CharacterBonusViewHolder(CharacterBonusBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
+            mBonusNameLayout = binding.getRoot().findViewById(R.id.layout_bonus_description);
         }
 
         void bind(CharacterBonus bonus) {
             mBinding.setBonus(bonus);
             mBinding.executePendingBindings();
+        }
+
+        public TextInputLayout getBonusNameLayout() {
+            return mBonusNameLayout;
         }
     }
 }

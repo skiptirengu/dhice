@@ -12,4 +12,8 @@ public class Conv {
     public static int stringToInt(String num) {
         return num == null || num.isEmpty() ? 0 : Integer.valueOf(num);
     }
+
+    public static boolean nullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
 }

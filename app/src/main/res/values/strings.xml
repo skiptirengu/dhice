@@ -8,7 +8,7 @@
     <string name="delete">Delete</string>
 
     <string name="validation_name_required">Name is required</string>
-    <string name="validation_race_required">Race is required</string>
+    <string name="validation_description_required">Description is required</string>
 
     <string name="title_characters">Characters</string>
     <string name="title_roll">Roll</string>
@@ -18,7 +18,7 @@
     <string name="label_select_character">Select character</string>
     <string name="label_bonus_type">Bonus type</string>
     <string name="label_character_name">Name*</string>
-    <string name="label_character_race">Race*</string>
+    <string name="label_character_race">Race</string>
     <string name="label_i_mostly_use">I mostly use:</string>
     <string name="label_magic_spells">Magic spells</string>
     <string name="label_weapon_attacks">Weapon attacks</string>
@@ -28,7 +28,13 @@
     <string name="error_save_character">Unable to save character</string>
     <string name="error_nothing_to_see">Nothing to see here</string>
 
-    <array name="array_item">
-        <item>String</item>
+    <string name="bonus_initiative">Initiative</string>
+    <string name="bonus_spell">Spell attack</string>
+    <string name="bonus_atack">Weapon attack</string>
+
+    <array name="bonus_types">
+        <item>@string/bonus_atack</item>
+        <item>@string/bonus_spell</item>
+        <item>@string/bonus_initiative</item>
     </array>
 </resources>

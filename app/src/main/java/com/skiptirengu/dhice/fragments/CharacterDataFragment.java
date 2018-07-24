@@ -168,7 +168,7 @@ public class CharacterDataFragment extends Fragment implements OnCheckedChangeLi
         View error = null;
 
         if (mEdtRace.getText().toString().isEmpty()) {
-            mEdtRace.setError(getString(R.string.validation_race_required));
+            mEdtRace.setError(getString(R.string.validation_name_required));
             error = mEdtRace;
         }
         if (mEdtName.getText().toString().isEmpty()) {

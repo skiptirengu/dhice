@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <import type="com.skiptirengu.dhice.util.Conv" />
 
         <variable
@@ -36,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/character_bonus_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -73,7 +74,7 @@
                         style="@style/Base.Widget.AppCompat.Spinner.Underlined"
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
-                        android:entries="@array/array_item" />
+                        android:entries="@array/bonus_types" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -87,7 +88,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <EditText
+                        <android.support.design.widget.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/bonus"

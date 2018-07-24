@@ -3,6 +3,8 @@ package com.skiptirengu.dhice.ui.character;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +26,10 @@ import com.skiptirengu.dhice.storage.CharacterBonus;
 import com.skiptirengu.dhice.storage.CharacterBonusEntity;
 import com.skiptirengu.dhice.ui.base.RxMvpLceViewStateController;
 import com.skiptirengu.dhice.ui.characterlist.CharacterListController;
+import com.skiptirengu.dhice.util.Conv;
+
+import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +44,10 @@ public class CharacterController extends
 
     @BindView(R.id.recylerView)
     protected RecyclerView mRecyclerView;
+    @BindView(R.id.txt_layout_character_name)
+    protected TextInputLayout mCharacterNameLayout;
+    @BindView(R.id.contentView)
+    protected NestedScrollView mScroll;
 
     private CharacterBonusAdapter mAdapter;
     private Character mCharacter;
@@ -126,16 +136,58 @@ public class CharacterController extends
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_save_btn) {
-            return onSaveClick();
+            onSaveClick();
+            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
-    public boolean onSaveClick() {
-        getPresenter().saveCharacter(mCharacter);
-        return true;
+    public void onSaveClick() {
+        if (validate()) {
+            getPresenter().saveCharacter(mCharacter);
+        }
+    }
+
+    private boolean validate() {
+        View focusView = null;
+
+        List<CharacterBonus> bonusList = mCharacter.getBonuses();
+        for (int index = bonusList.size() - 1; index >= 0; index--) {
+            CharacterBonus bonus = bonusList.get(index);
+            CharacterBonusAdapter.CharacterBonusViewHolder viewHolder = getViewHolder(index);
+
+            TextInputLayout bonusNameLayout = viewHolder.getBonusNameLayout();
+            if (Conv.nullOrEmpty(bonus.getDescription())) {
+                bonusNameLayout.setError(getString(R.string.validation_description_required));
+                focusView = bonusNameLayout;
+            } else {
+                bonusNameLayout.setError(null);
+            }
+        }
+
+        if (Conv.nullOrEmpty(mCharacter.getName())) {
+            mCharacterNameLayout.setError(getString(R.string.validation_name_required));
+            focusView = mCharacterNameLayout;
+        } else {
+            mCharacterNameLayout.setError(null);
+        }
+
+        if (focusView != null) {
+            focusView.requestFocus();
+            mScroll.smoothScrollTo(focusView.getScrollX(), focusView.getScrollY());
+        }
+
+        return focusView == null;
+    }
+
+    private CharacterBonusAdapter.CharacterBonusViewHolder getViewHolder(int index) {
+        return (CharacterBonusAdapter.CharacterBonusViewHolder) mRecyclerView.findViewHolderForAdapterPosition(index);
+    }
+
+    private String getString(int res) {
+        return Objects.requireNonNull(getResources()).getString(res);
     }
 
     @Override
