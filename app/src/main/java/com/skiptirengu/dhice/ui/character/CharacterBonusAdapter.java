@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.skiptirengu.dhice.R;
@@ -39,8 +40,9 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
     public void onBindViewHolder(@NonNull CharacterBonusViewHolder holder, int position) {
         final CharacterBonus bonus = mList.get(position);
         holder.bind(bonus);
-        holder.itemView.setTag(bonus.uniqueId());
-        holder.itemView.findViewById(R.id.btn_delete_bonus).setOnClickListener(v -> mOnClickSubject.onNext((String) holder.itemView.getTag()));
+        View delete = holder.itemView.findViewById(R.id.btn_delete_bonus);
+        delete.setTag(bonus.uniqueId());
+        delete.setOnClickListener(v -> mOnClickSubject.onNext((String) v.getTag()));
     }
 
     @Override
