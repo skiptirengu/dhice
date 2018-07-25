@@ -9,7 +9,7 @@ interface CharacterContract {
     interface View extends MvpLceView<Character> {
         void onAddBonus(android.view.View view);
 
-        void onRemoveBonus(int position);
+        void onRemoveBonus(String position);
 
         void onSaveClick();
 

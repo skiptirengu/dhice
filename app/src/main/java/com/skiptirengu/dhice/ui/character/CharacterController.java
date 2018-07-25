@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,13 +29,11 @@ import com.skiptirengu.dhice.ui.base.RxMvpLceViewStateController;
 import com.skiptirengu.dhice.ui.characterlist.CharacterListController;
 import com.skiptirengu.dhice.util.Conv;
 
-import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class CharacterController extends
         RxMvpLceViewStateController<FrameLayout, Character, CharacterContract.View, CharacterContract.Presenter>
@@ -96,11 +95,11 @@ public class CharacterController extends
 
     private void setupRecyclerView(Context context) {
         mAdapter = new CharacterBonusAdapter();
-        disposeOnDetach(mAdapter.delete().subscribe(position -> onRemoveBonus(position)));
+        disposeOnDetach(mAdapter.delete().subscribe(tag -> onRemoveBonus(tag)));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.setNestedScrollingEnabled(false);
-        mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
     @NonNull
@@ -129,7 +128,7 @@ public class CharacterController extends
     }
 
     @Override
-    public void onRemoveBonus(int position) {
+    public void onRemoveBonus(String position) {
         mAdapter.removeItem(position);
     }
 
@@ -153,20 +152,6 @@ public class CharacterController extends
     private boolean validate() {
         View focusView = null;
 
-        List<CharacterBonus> bonusList = mCharacter.getBonuses();
-        for (int index = bonusList.size() - 1; index >= 0; index--) {
-            CharacterBonus bonus = bonusList.get(index);
-            CharacterBonusAdapter.CharacterBonusViewHolder viewHolder = getViewHolder(index);
-
-            TextInputLayout bonusNameLayout = viewHolder.getBonusNameLayout();
-            if (Conv.nullOrEmpty(bonus.getDescription())) {
-                bonusNameLayout.setError(getString(R.string.validation_description_required));
-                focusView = bonusNameLayout;
-            } else {
-                bonusNameLayout.setError(null);
-            }
-        }
-
         if (Conv.nullOrEmpty(mCharacter.getName())) {
             mCharacterNameLayout.setError(getString(R.string.validation_name_required));
             focusView = mCharacterNameLayout;
@@ -180,10 +165,6 @@ public class CharacterController extends
         }
 
         return focusView == null;
-    }
-
-    private CharacterBonusAdapter.CharacterBonusViewHolder getViewHolder(int index) {
-        return (CharacterBonusAdapter.CharacterBonusViewHolder) mRecyclerView.findViewHolderForAdapterPosition(index);
     }
 
     private String getString(int res) {

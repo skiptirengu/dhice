@@ -2,7 +2,6 @@ package com.skiptirengu.dhice.ui.character;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
 
     private final Object mListLock = new Object();
     private List<CharacterBonus> mList;
-    private PublishSubject<Integer> mOnClickSubject = PublishSubject.create();
+    private PublishSubject<String> mOnClickSubject = PublishSubject.create();
 
     CharacterBonusAdapter() {
         mList = new ArrayList<>();
@@ -38,10 +37,10 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
 
     @Override
     public void onBindViewHolder(@NonNull CharacterBonusViewHolder holder, int position) {
-        final int finalPosition = position;
         final CharacterBonus bonus = mList.get(position);
         holder.bind(bonus);
-        holder.itemView.findViewById(R.id.btn_delete_bonus).setOnClickListener(v -> mOnClickSubject.onNext(finalPosition));
+        holder.itemView.setTag(bonus.uniqueId());
+        holder.itemView.findViewById(R.id.btn_delete_bonus).setOnClickListener(v -> mOnClickSubject.onNext((String) holder.itemView.getTag()));
     }
 
     @Override
@@ -57,7 +56,7 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
         }
     }
 
-    public Observable<Integer> delete() {
+    public Observable<String> delete() {
         return mOnClickSubject;
     }
 
@@ -70,10 +69,16 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
         }
     }
 
-    public void removeItem(int position) {
+    public void removeItem(String tag) {
         synchronized (mListLock) {
-            mList.remove(position);
-            notifyItemRemoved(position);
+            for (int i = 0; i < mList.size(); i++) {
+                CharacterBonus bonus = mList.get(i);
+                if (bonus.uniqueId().equals(tag)) {
+                    mList.remove(i);
+                    notifyItemRemoved(i);
+                    return;
+                }
+            }
         }
     }
 
@@ -87,21 +92,15 @@ public class CharacterBonusAdapter extends RecyclerView.Adapter<CharacterBonusAd
 
     class CharacterBonusViewHolder extends RecyclerView.ViewHolder {
         final CharacterBonusBinding mBinding;
-        final TextInputLayout mBonusNameLayout;
 
         private CharacterBonusViewHolder(CharacterBonusBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
-            mBonusNameLayout = binding.getRoot().findViewById(R.id.layout_bonus_description);
         }
 
         void bind(CharacterBonus bonus) {
             mBinding.setBonus(bonus);
             mBinding.executePendingBindings();
-        }
-
-        public TextInputLayout getBonusNameLayout() {
-            return mBonusNameLayout;
         }
     }
 }
