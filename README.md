@@ -1,3 +1,3 @@
 # dhice
 
-A simple project to learn Android patterns
+A simple project to learn most commonly used Android patterns
